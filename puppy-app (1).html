@@ -1,0 +1,4021 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>治愈系虚拟小狗陪伴系统</title>
+  <!-- PWA 核心元信息配置 -->
+  <meta name="theme-color" content="#ff8e43">
+  <meta name="description" content="治愈系虚拟小狗陪伴系统 - 你的专属电子宠物与每日自律打卡伙伴">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="治愈小狗">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%23ff9e59'/%3E%3Ccircle cx='256' cy='272' r='165' fill='%23fff8f0'/%3E%3Cellipse cx='128' cy='220' rx='52' ry='96' fill='%23c47d1e' transform='rotate(20 128 220)'/%3E%3Cellipse cx='384' cy='220' rx='52' ry='96' fill='%23c47d1e' transform='rotate(-20 384 220)'/%3E%3Ccircle cx='256' cy='256' r='142' fill='%23e29b38'/%3E%3Cellipse cx='256' cy='302' rx='68' ry='48' fill='%23ffffff'/%3E%3Cpath d='M 234 270 Q 256 256 278 270 Q 256 300 234 270 Z' fill='%232c221e'/%3E%3Cpath d='M 256 288 L 256 306 M 256 306 Q 230 324 212 306 M 256 306 Q 282 324 300 306' stroke='%232c221e' stroke-width='11' stroke-linecap='round' fill='none'/%3E%3Ccircle cx='195' cy='242' r='20' fill='%232c221e'/%3E%3Ccircle cx='317' cy='242' r='20' fill='%232c221e'/%3E%3Ccircle cx='203' cy='234' r='8' fill='%23ffffff'/%3E%3Ccircle cx='325' cy='234' r='8' fill='%23ffffff'/%3E%3Ccircle cx='160' cy='282' r='20' fill='%23ffb3b3' opacity='0.7'/%3E%3Ccircle cx='352' cy='282' r='20' fill='%23ffb3b3' opacity='0.7'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg-color: #f7f3ec;
+      --card-bg: #ffffff;
+      --primary: #ff8e43;
+      --primary-light: #fff2e8;
+      --secondary: #6cb2eb;
+      --accent: #ff6b6b;
+      --text-main: #4a3e3d;
+      --text-sub: #8c7a78;
+      --border-color: #f0e6dd;
+      --shadow: 0 10px 30px rgba(149, 107, 78, 0.1);
+      --radius: 24px;
+      --btn-shadow: 0 6px 16px rgba(255, 142, 67, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #ebdcd0;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      max-height: 900px;
+      background: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    @media (min-width: 500px) {
+      #app {
+        height: 95vh;
+        border-radius: 36px;
+        border: 6px solid #ffffff;
+      }
+    }
+
+    .hidden { display: none !important; }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: 50px;
+      border: none;
+      background: linear-gradient(135deg, #ff9e59 0%, #ff7d26 100%);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: var(--btn-shadow);
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .btn:active {
+      transform: scale(0.94);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      background: #ccc;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: #f0e6dd;
+      color: var(--text-main);
+      box-shadow: none;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .nav-bar {
+      height: 70px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid var(--border-color);
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      z-index: 10;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: var(--text-sub);
+      font-size: 11px;
+      cursor: pointer;
+      flex: 1;
+      transition: all 0.2s;
+    }
+
+    .nav-item .icon { 
+      font-size: 22px; 
+      transition: transform 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .nav-item.active .icon {
+      transform: translateY(-2px) scale(1.15);
+    }
+
+    .view-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 85px;
+    }
+
+    #adopt-view {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-color);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 20px;
+      overflow-y: auto;
+    }
+
+    .adopt-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    .adopt-subtitle {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 24px;
+    }
+
+    .breed-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .breed-card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: all 0.2s;
+    }
+
+    .breed-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .breed-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #fdf5ef;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+    }
+
+    .header-bar {
+      background: #ffffff;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    .status-badge {
+      font-size: 12px;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+
+    .exp-bar-container {
+      width: 95px;
+      height: 9px;
+      background: #f0e6dd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .exp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff9e59, #ff7d26);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .pet-room {
+      position: relative;
+      height: 350px;
+      background: linear-gradient(180deg, #e0f2fe 0%, #fff8f0 60%, #e2cfba 100%);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      overflow: hidden;
+      border: 4px solid #ffffff;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: all 0.6s ease;
+      touch-action: manipulation;
+    }
+
+    .room-background-3d {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .pet-room.night-mode {
+      filter: brightness(0.45) contrast(1.1);
+    }
+
+    .pet-stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .speech-bubble {
+      position: absolute;
+      top: 18px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      border: 1px solid var(--border-color);
+      pointer-events: none;
+      transition: all 0.3s;
+      z-index: 20;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 7px 7px 0;
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.95) transparent;
+    }
+
+    .dress-up-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 25;
+      background: #ffffff;
+      border: 2px solid var(--primary-light);
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .dress-up-btn:active { transform: scale(0.92); }
+
+    .puppy-svg-container {
+      width: 130px;
+      height: 130px;
+      position: absolute;
+      transition: left 0.4s ease-out, top 0.4s ease-out, transform 0.2s ease;
+      cursor: pointer;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    .puppy-animation-bounce {
+      animation: puppyBounce 1.6s infinite alternate ease-in-out;
+    }
+
+    @keyframes puppyBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-10px); }
+    }
+
+    .dropped-item {
+      position: absolute;
+      font-size: 28px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 5;
+      animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: translate(-50%, -50%) scale(0); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .action-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 14px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: all 0.2s ease;
+    }
+    .action-btn:active {
+      transform: scale(0.94);
+      background: var(--primary-light);
+    }
+
+    .action-btn .icon { font-size: 26px; }
+    .action-btn .label { font-size: 12px; font-weight: bold; color: var(--text-main); }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: white;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 400px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 22px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title { font-size: 18px; font-weight: bold; }
+    .close-btn { font-size: 20px; cursor: pointer; color: #aaa; padding: 4px 8px; }
+
+    .brush-stage {
+      height: 360px;
+      background: radial-gradient(circle, #fff0e6 0%, #ffdcd0 100%);
+      border-radius: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      touch-action: none;
+      border: 3px solid #ffb09c;
+      cursor: none;
+    }
+
+    .custom-cursor-brush {
+      position: absolute;
+      pointer-events: none;
+      z-index: 30;
+      transform: rotate(-30deg);
+      transition: transform 0.05s ease;
+    }
+
+    @keyframes goldGlow {
+      0% { filter: drop-shadow(0 0 4px #ffd700); }
+      50% { filter: drop-shadow(0 0 14px #fff3a0); }
+      100% { filter: drop-shadow(0 0 4px #ffd700); }
+    }
+    .gold-brush-active { animation: goldGlow 1s infinite ease-in-out; }
+
+    .draggable-decor {
+      position: absolute;
+      cursor: grab;
+      user-select: none;
+      z-index: 4;
+      transition: transform 0.1s ease;
+    }
+    .draggable-decor.editing {
+      outline: 2px dashed var(--primary);
+      outline-offset: 4px;
+      cursor: move;
+    }
+
+    .mouth-open-svg {
+      width: 320px;
+      height: 240px;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+    }
+
+    .dirt-spot {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #d4a359;
+      border-radius: 50%;
+      opacity: 0.9;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      box-shadow: inset 0 0 3px rgba(0,0,0,0.3);
+      pointer-events: auto;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .shop-item {
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      text-align: center;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+    }
+
+    .shop-tab {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #f0e6dd;
+      color: var(--text-main);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .shop-tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .task-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      border: 2px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .checkbox.checked {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .mood-grid-selector {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .mood-chip {
+      background: #fdf5ef;
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 11px;
+    }
+
+    .mood-chip.selected {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      font-weight: bold;
+      color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    .badge-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      border-radius: 18px;
+      padding: 14px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .badge-card:active { transform: scale(0.96); }
+
+    .badge-card.unlocked {
+      background: #fffdf5;
+      border-color: #ffd700;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.25);
+    }
+
+    .badge-card.locked {
+      opacity: 0.55;
+      filter: grayscale(100%);
+      background: #f9f8f6;
+    }
+
+    .badge-status-tag {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-top: 2px;
+      font-weight: bold;
+    }
+
+    .badge-card.unlocked .badge-status-tag {
+      background: #fff0b3;
+      color: #946200;
+    }
+
+    .badge-card.locked .badge-status-tag {
+      background: #e2e2e2;
+      color: #777777;
+    }
+
+    .pomo-timer-display {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ffffff 60%, #fff2e8 100%);
+      border: 6px solid var(--primary-light);
+      box-shadow: inset 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .pomo-time-text {
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: monospace;
+    }
+
+    #toast-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast {
+      background: rgba(50, 40, 38, 0.9);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      animation: toastFade 2.5s forwards;
+    }
+
+    .badge-unlock-toast {
+      background: linear-gradient(135deg, #ffffff 0%, #fff9f0 100%);
+      color: var(--text-main);
+      border: 2px solid #ffd700;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 10px 30px rgba(255, 215, 0, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: badgePop 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes badgePop {
+      0% { opacity: 0; transform: scale(0.6) translateY(-20px); }
+      15% { opacity: 1; transform: scale(1.05) translateY(0); }
+      25% { transform: scale(1); }
+      85% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.7) translateY(-10px); }
+    }
+
+    @keyframes toastFade {
+      0% { opacity: 0; transform: scale(0.8); }
+      15% { opacity: 1; transform: scale(1); }
+      85% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.8); }
+    }
+
+    .dress-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .dress-item {
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      background: #fafafa;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .dress-item.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .dress-item.locked {
+      opacity: 0.5;
+      background: #f0f0f0;
+    }
+    .dress-lock-badge {
+      font-size: 9px;
+      background: #e2e2e2;
+      color: #666;
+      padding: 1px 6px;
+      border-radius: 8px;
+    }
+  </style>
+  <style id="beautify">
+/* Beautify theme */
+
+:root{
+  --bg-color:#fbf6ef; --primary:#ff8a3d; --primary-light:#fff0e2; --secondary:#5fb0ee;
+  --text-main:#3d302d; --text-sub:#8f7d78; --border-color:rgba(120,80,50,.09);
+  --radius:26px;
+  --shadow:0 1px 2px rgba(120,70,30,.06),0 10px 28px -8px rgba(150,95,50,.16);
+  --btn-shadow:0 8px 18px -6px rgba(255,125,38,.55);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+}
+*{font-family:"Nunito","SF Pro Rounded","PingFang SC","HarmonyOS Sans SC","Noto Sans SC","Microsoft YaHei",-apple-system,"Segoe UI",sans-serif}
+input,textarea{user-select:text;-webkit-user-select:text}
+::-webkit-scrollbar{width:0;height:0}
+
+body{
+  background:
+    radial-gradient(60vmax 60vmax at 10% 0%,#ffe2c7 0%,transparent 60%),
+    radial-gradient(50vmax 50vmax at 100% 100%,#cfe8fb 0%,transparent 60%),
+    #f3e6d8;
+}
+#app{
+  background:linear-gradient(180deg,#fff9f2 0%,#fbf3e8 100%);
+  box-shadow:0 30px 70px -20px rgba(110,70,40,.35);
+}
+@media(min-width:500px){#app{border:8px solid rgba(255,255,255,.9)}}
+
+/* ---------- header ---------- */
+.header-bar{
+  margin:10px 12px 0;padding:10px 14px;border:0;border-radius:22px;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(14px);
+  box-shadow:var(--shadow);position:relative;z-index:5;
+}
+.status-badge{background:linear-gradient(135deg,#fff0e2,#ffe3cc);color:#e8700f;letter-spacing:.2px}
+.exp-bar-container{height:8px;width:100px;background:#f6e6d6;box-shadow:inset 0 1px 2px rgba(120,70,30,.12)}
+.exp-bar-fill{background:linear-gradient(90deg,#ffb36b,#ff7a21);border-radius:10px;box-shadow:0 0 8px rgba(255,138,61,.55)}
+#status-coins{font-variant-numeric:tabular-nums}
+
+/* ---------- buttons ---------- */
+.btn{
+  background:linear-gradient(160deg,#ffa766 0%,#ff7a21 100%);
+  box-shadow:var(--btn-shadow),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .25s var(--ease-spring),box-shadow .2s;
+}
+.btn:hover{box-shadow:0 10px 22px -6px rgba(255,125,38,.65),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn:active{transform:scale(.93)}
+.btn-secondary{background:#f6ebdf;color:var(--text-main);box-shadow:none}
+.btn:focus-visible,.nav-item:focus-visible,.action-btn:focus-visible{outline:3px solid rgba(255,138,61,.45);outline-offset:2px}
+
+/* ---------- cards & inputs ---------- */
+.card{border:0;padding:20px;box-shadow:var(--shadow);background:rgba(255,255,255,.92)}
+input[type=text],input[type=number],textarea{
+  background:#fffaf5;border:1.5px solid #f1e3d5 !important;transition:border-color .2s,box-shadow .2s
+}
+input:focus,textarea:focus{border-color:var(--primary) !important;box-shadow:0 0 0 4px rgba(255,138,61,.15)}
+[style*="#fdf5ef"]{background:linear-gradient(160deg,#fff6ee,#fdf0e4) !important;border:1px solid rgba(255,150,70,.1)}
+
+/* ---------- floating nav ---------- */
+.view-content{padding:14px 14px 108px}
+.view-content:not(.hidden){animation:viewIn .4s ease}
+@keyframes viewIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.nav-bar{
+  left:12px;width:calc(100% - 24px);bottom:calc(12px + env(safe-area-inset-bottom,0px));height:66px;
+  border:0;border-radius:28px;padding:0 6px;
+  background:rgba(255,255,255,.88);backdrop-filter:blur(18px) saturate(1.4);
+  box-shadow:0 14px 34px -10px rgba(120,70,30,.4),0 0 0 1px rgba(255,255,255,.8) inset;
+}
+.nav-item{position:relative;border-radius:20px;margin:0 2px;padding:7px 0;transition:background .25s,color .25s}
+.nav-item.active{background:var(--primary-light)}
+.nav-item.active::after{content:"";position:absolute;bottom:3px;width:14px;height:3px;border-radius:3px;background:var(--primary)}
+.nav-item .icon{transition:transform .35s var(--ease-spring)}
+.nav-item.active .icon{transform:translateY(-2px) scale(1.2)}
+
+/* ---------- pet room (hero) ---------- */
+.pet-room{
+  height:360px;border:0;border-radius:32px;
+  box-shadow:0 0 0 5px #fff,0 18px 40px -14px rgba(130,80,40,.45),inset 0 -30px 50px -30px rgba(120,70,30,.25);
+}
+.pet-room::before{ /* warm window light */
+  content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:radial-gradient(70% 55% at 50% 12%,rgba(255,244,200,.55),transparent 70%);
+}
+.puppy-svg-container::after{
+  content:"";position:absolute;left:18%;right:18%;bottom:-2px;height:12px;z-index:-1;
+  background:radial-gradient(ellipse at center,rgba(90,50,20,.28),transparent 70%);
+}
+.puppy-svg-container svg{filter:drop-shadow(0 6px 8px rgba(110,60,20,.18))}
+.speech-bubble{
+  top:16px;max-width:82%;text-align:center;line-height:1.4;color:var(--text-main);
+  background:rgba(255,255,255,.96);border:0;border-radius:18px;
+  box-shadow:0 8px 20px -6px rgba(120,70,30,.28);
+}
+.dress-up-btn{top:14px;right:14px;border:0;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);box-shadow:0 6px 14px -4px rgba(120,70,30,.3)}
+#equipped-toy-tag{border:0 !important;background:#fff !important;box-shadow:var(--shadow)}
+.dropped-item{filter:drop-shadow(0 4px 4px rgba(0,0,0,.2))}
+
+/* ---------- quick actions ---------- */
+.action-grid{gap:10px}
+.action-btn{
+  border:0;border-radius:22px;padding:14px 4px 12px;background:#fff;box-shadow:var(--shadow);
+  transition:transform .25s var(--ease-spring),box-shadow .2s;
+}
+.action-btn .icon{
+  width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:24px;
+  background:linear-gradient(160deg,#fff3e6,#ffe4cd);
+}
+.action-btn:nth-child(2) .icon{background:linear-gradient(160deg,#e8f4ff,#d3e9fb)}
+.action-btn:nth-child(3) .icon{background:linear-gradient(160deg,#eeeaff,#ddd6fb)}
+.action-btn:nth-child(4) .icon{background:linear-gradient(160deg,#eaf8e4,#d5f0cb)}
+.action-btn:active{transform:scale(.92);background:#fff}
+.action-btn .label{font-size:12px;color:var(--text-sub)}
+
+/* ---------- tasks ---------- */
+.task-item{padding:13px 4px;border-bottom:1px dashed rgba(120,80,50,.12)}
+.task-item:last-child{border-bottom:0}
+.checkbox{width:24px;height:24px;border-radius:9px;border:2px solid #e6d6c6;transition:transform .3s var(--ease-spring),background .2s}
+.checkbox.checked{background:linear-gradient(160deg,#ffa766,#ff7a21);border-color:transparent;transform:scale(1.1)}
+
+/* ---------- mood ---------- */
+.mood-chip{background:#fff;border:1.5px solid #f3e6d9;border-radius:16px;padding:9px 2px;transition:transform .25s var(--ease-spring)}
+.mood-chip.selected{background:var(--primary-light);border-color:var(--primary);box-shadow:0 6px 14px -6px rgba(255,125,38,.5)}
+#quote-display-box{border-left:0 !important;background:#fff !important;border-radius:16px !important;line-height:1.6;font-size:14px !important;box-shadow:inset 0 0 0 1px rgba(255,138,61,.15)}
+
+/* ---------- pomodoro ---------- */
+.pomo-timer-display{
+  width:200px;height:200px;border:8px solid transparent;
+  background:linear-gradient(#fff,#fff7ef) padding-box,conic-gradient(from 200deg,#ffb36b,#ff7a21,#ffd7b0,#ffb36b) border-box;
+  box-shadow:0 18px 36px -14px rgba(255,125,38,.45),inset 0 4px 14px rgba(0,0,0,.04);
+}
+.pomo-time-text{font-size:42px;font-variant-numeric:tabular-nums;letter-spacing:1px;font-family:ui-rounded,"SF Mono",Menlo,monospace}
+
+/* ---------- shop / wardrobe ---------- */
+.shop-tab{padding:8px 15px;background:#f6ebdf;transition:all .2s}
+.shop-tab.active{background:linear-gradient(160deg,#ffa766,#ff7a21);box-shadow:0 6px 12px -4px rgba(255,125,38,.55)}
+.shop-item{border:0;border-radius:22px;padding:16px 12px;box-shadow:var(--shadow);transition:transform .25s var(--ease-spring)}
+.shop-item:active{transform:scale(.97)}
+.dress-item{border:1.5px solid #f3e6d9;border-radius:18px;background:#fff;transition:transform .25s var(--ease-spring)}
+.dress-item.active{border-color:var(--primary);box-shadow:0 6px 14px -6px rgba(255,125,38,.5)}
+
+/* ---------- badges ---------- */
+.badge-card{border:0;border-radius:20px;background:#fff;box-shadow:var(--shadow)}
+.badge-card.unlocked{background:linear-gradient(160deg,#fffdf2,#fff3c8);box-shadow:0 0 0 1.5px #ffd84d,0 10px 20px -8px rgba(255,200,0,.55)}
+.badge-card.locked{opacity:.5;box-shadow:none;background:#f4efe9}
+
+/* ---------- modals ---------- */
+.modal-overlay{background:rgba(60,35,20,.4);backdrop-filter:blur(8px);animation:fadeIn .25s ease}
+.modal-card{border-radius:32px;padding:24px;box-shadow:0 30px 60px -20px rgba(60,35,20,.5);animation:sheetIn .4s var(--ease-spring)}
+.modal-title{font-size:19px}
+.close-btn{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#f6ebdf;color:#a08a80;font-size:14px;padding:0}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes sheetIn{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:none}}
+.brush-stage{border:0;box-shadow:inset 0 0 0 4px #fff,0 10px 24px -10px rgba(200,100,70,.5);background:radial-gradient(circle,#fff4ec 0%,#ffd9cb 100%)}
+
+/* ---------- toasts ---------- */
+.toast{background:rgba(48,34,30,.92);backdrop-filter:blur(8px);padding:12px 22px;max-width:86vw;text-align:center}
+.badge-unlock-toast{box-shadow:0 18px 40px -12px rgba(255,190,0,.6)}
+
+/* ---------- adopt screen ---------- */
+#adopt-view{background:radial-gradient(70% 40% at 50% 0%,#ffe6cf,transparent),#fbf6ef}
+.adopt-title{background:linear-gradient(135deg,#ff9a4d,#ff6a1f);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:28px}
+.breed-card{border:2px solid transparent;border-radius:24px;transition:transform .25s var(--ease-spring),border-color .2s}
+.breed-card:active{transform:scale(.98)}
+.breed-card.selected{border-color:var(--primary);background:linear-gradient(160deg,#fff,#fff0e2);box-shadow:0 12px 26px -10px rgba(255,125,38,.5)}
+.breed-avatar{width:64px;height:64px;background:linear-gradient(160deg,#fff3e6,#ffe0c4)}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+  
+/* ---------- puppy character ---------- */
+.puppy-svg-container svg{overflow:visible}
+.tail-wag{transform-box:fill-box;transform-origin:0% 100%;animation:wag .45s ease-in-out infinite alternate}
+@keyframes wag{from{transform:rotate(-12deg)}to{transform:rotate(24deg)}}
+.eye-blink{transform-box:fill-box;transform-origin:center;animation:blink 4.6s infinite}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
+.ear-l{transform-box:fill-box;transform-origin:80% 10%;animation:earL 6s infinite}
+.ear-r{transform-box:fill-box;transform-origin:20% 10%;animation:earR 7s infinite}
+@keyframes earL{0%,88%,100%{transform:rotate(0)}92%{transform:rotate(-9deg)}96%{transform:rotate(2deg)}}
+@keyframes earR{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(9deg)}90%{transform:rotate(-2deg)}}
+.head-tilt{transform-box:view-box;transform-origin:50px 80px;animation:tilt 7s ease-in-out infinite}
+@keyframes tilt{0%,62%,100%{transform:rotate(0)}70%,86%{transform:rotate(6deg)}}
+.tongue{transform-box:fill-box;transform-origin:50% 0;animation:pant 1.1s ease-in-out infinite}
+@keyframes pant{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.18)}}
+.zzz{animation:zfloat 2.4s ease-in-out infinite}
+.zzz.z2{animation-delay:.9s}
+@keyframes zfloat{0%{opacity:0;transform:translateY(4px)}40%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
+.pop-heart{position:absolute;font-size:20px;pointer-events:none;z-index:30;animation:heartUp 1.2s ease-out forwards}
+@keyframes heartUp{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1}100%{opacity:0;transform:translateY(-60px) scale(1.2)}}
+@media(prefers-reduced-motion:reduce){.tail-wag,.eye-blink,.ear-l,.ear-r,.head-tilt,.tongue,.zzz{animation:none !important}}
+  
+/* ---------- alarms ---------- */
+.switch{position:relative;width:46px;height:27px;flex:none;display:inline-block}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch span{position:absolute;inset:0;background:#e6d6c6;border-radius:27px;transition:.25s;cursor:pointer}
+.switch span::before{content:"";position:absolute;width:21px;height:21px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .3s var(--ease-spring);box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.switch input:checked+span{background:linear-gradient(160deg,#ffa766,#ff7a21)}
+.switch input:checked+span::before{transform:translateX(19px)}
+.alarm-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;margin-bottom:8px;background:linear-gradient(160deg,#fff7ee,#fdf0e4);border-radius:18px}
+.alarm-time{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.alarm-row.off .alarm-time{color:#cdbcb0}
+input[type=time]{font:inherit;font-size:15px;font-weight:700;padding:8px 10px;border-radius:12px;border:1.5px solid #f1e3d5;background:#fffaf5;outline:none;color:var(--text-main)}
+input[type=time]:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(255,138,61,.15)}
+  
+/* ---------- welcome-back bubble ---------- */
+.welcome-bubble{position:absolute;z-index:9998;left:14px;right:14px;top:calc(76px + env(safe-area-inset-top,0px));display:flex;gap:12px;align-items:center;padding:14px 16px;background:#fff;border-radius:24px;font-size:13px;line-height:1.6;color:var(--text-main);box-shadow:0 20px 44px -12px rgba(120,70,30,.5),0 0 0 2px rgba(255,138,61,.18);animation:wbIn .55s var(--ease-spring);cursor:pointer}
+.welcome-bubble::after{content:"";position:absolute;top:-9px;left:34px;width:18px;height:18px;background:#fff;transform:rotate(45deg);border-radius:4px 0 0 0;box-shadow:-2px -2px 3px rgba(255,138,61,.1)}
+.wb-emoji{font-size:38px;flex:none;animation:wbWiggle 1.1s ease-in-out infinite}
+@keyframes wbIn{from{opacity:0;transform:translateY(-16px) scale(.85)}to{opacity:1;transform:none}}
+@keyframes wbWiggle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg) scale(1.08)}}
+  
+/* ---------- icons that never show as tofu boxes ---------- */
+.ico{display:inline-block;width:1.12em;height:1.12em;vertical-align:-.18em;background-repeat:no-repeat;background-position:center;background-size:contain}
+.ico-coin{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffe48a'/%3E%3Cstop offset='1' stop-color='%23f5a300'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14.2' fill='url(%23g)' stroke='%23c77d00' stroke-width='1.8'/%3E%3Ccircle cx='16' cy='16' r='10.4' fill='none' stroke='%23fff3c4' stroke-width='1.3' opacity='.85'/%3E%3Cg fill='%23b86e00'%3E%3Cellipse cx='16' cy='19.6' rx='4.3' ry='3.4'/%3E%3Cellipse cx='10.8' cy='15.2' rx='1.8' ry='2.3'/%3E%3Cellipse cx='14' cy='11.9' rx='1.8' ry='2.4'/%3E%3Cellipse cx='18' cy='11.9' rx='1.8' ry='2.4'/%3E%3Cellipse cx='21.2' cy='15.2' rx='1.8' ry='2.3'/%3E%3C/g%3E%3C/svg%3E")}
+.ico-brush{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg transform='rotate(40 16 16)'%3E%3Crect x='13.4' y='11' width='5.2' height='19' rx='2.6' fill='%235fb0ee'/%3E%3Crect x='13.4' y='11' width='5.2' height='3.2' fill='%234a97d6'/%3E%3Crect x='11.8' y='1.8' width='8.4' height='11.4' rx='2.2' fill='%23ffffff' stroke='%235fb0ee' stroke-width='1.5'/%3E%3Crect x='13.2' y='3.4' width='1.5' height='6.4' rx='.75' fill='%238ec9f5'/%3E%3Crect x='15.25' y='3.4' width='1.5' height='6.4' rx='.75' fill='%238ec9f5'/%3E%3Crect x='17.3' y='3.4' width='1.5' height='6.4' rx='.75' fill='%238ec9f5'/%3E%3C/g%3E%3C/svg%3E")}
+.action-btn .icon .ico{width:1em;height:1em;vertical-align:middle}
+  
+.action-btn.is-locked{opacity:.55;filter:grayscale(.45)}
+.action-btn.is-locked .label{font-size:11px}
+  
+/* ---------- chat ---------- */
+.speech-bubble{top:58px}
+.chat-open-btn{position:absolute;top:14px;left:14px;z-index:25;display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:30px;font-size:12px;font-weight:700;color:#2f7fc1;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);box-shadow:0 6px 14px -4px rgba(60,130,200,.4);cursor:pointer;transition:transform .25s var(--ease-spring)}
+.chat-open-btn:active{transform:scale(.92)}
+.chat-card{padding:0 !important;display:flex;flex-direction:column;height:min(82vh,640px);max-height:none;overflow:hidden}
+.chat-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(160deg,#eaf4ff,#fff);border-bottom:1px solid rgba(95,176,238,.18)}
+.chat-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:#d6ebff;box-shadow:0 0 0 3px #fff}
+#chat-settings{padding:10px 16px;background:#f5faff;border-bottom:1px solid rgba(95,176,238,.15)}
+.chat-list{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,#fbfdff,#fff8f0)}
+.chat-row{display:flex;align-items:flex-end;gap:8px;max-width:100%}
+.chat-row.me{justify-content:flex-end}
+.chat-mini-avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:#d6ebff;flex:none}
+.chat-bubble{max-width:78%;padding:10px 14px;border-radius:20px;font-size:14px;line-height:1.55;word-break:break-word;user-select:text;-webkit-user-select:text;animation:bubbleIn .3s var(--ease-spring)}
+.chat-row.dog .chat-bubble{background:#e6f2ff;color:#24425e;border-bottom-left-radius:6px}
+.chat-row.me .chat-bubble{background:linear-gradient(160deg,#ffa766,#ff7a21);color:#fff;border-bottom-right-radius:6px}
+.chat-row.typing .chat-bubble{letter-spacing:3px;animation:typingPulse 1s infinite}
+@keyframes bubbleIn{from{opacity:0;transform:translateY(8px) scale(.92)}to{opacity:1;transform:none}}
+@keyframes typingPulse{0%,100%{opacity:.4}50%{opacity:1}}
+.chat-chips{display:flex;gap:6px;overflow-x:auto;padding:8px 14px;background:#fff8f0}
+.chat-chip{flex:none;border:0;padding:7px 12px;border-radius:16px;font-size:12px;font-weight:700;color:#2f7fc1;background:#e6f2ff;cursor:pointer}
+.chat-input-row{display:flex;gap:8px;padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));background:#fff}
+#chat-input{flex:1;min-width:0;font-size:16px;padding:10px 14px;border-radius:22px;outline:none}
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="toast-container"></div>
+
+  <!-- Adoption View -->
+  <div id="adopt-view">
+    <div class="adopt-title">🐾 领养你的专属小狗</div>
+    <div class="adopt-subtitle">选择一只陪伴你成长的小狗狗吧</div>
+
+    <div class="breed-list">
+      <div class="breed-card selected" onclick="selectBreed('golden')" id="breed-golden">
+        <div class="breed-avatar">🦮</div>
+        <div>
+          <div style="font-weight: bold;">金毛寻回犬</div>
+          <div style="font-size: 12px; color: #888;">性格温顺，充满治愈力量的大温暖</div>
+        </div>
+      </div>
+      <div class="breed-card" onclick="selectBreed('corgi')" id="breed-corgi">
+        <div class="breed-avatar">🐕</div>
+        <div>
+          <div style="font-weight: bold;">柯基犬</div>
+          <div style="font-size: 12px; color: #888;">小短腿大屁股，活泼可爱小机灵</div>
+        </div>
+      </div>
+      <div class="breed-card" onclick="selectBreed('samoyed')" id="breed-samoyed">
+        <div class="breed-avatar">🐩</div>
+        <div>
+          <div style="font-weight: bold;">萨摩耶</div>
+          <div style="font-size: 12px; color: #888;">微笑天使，雪白软萌治愈系</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 24px; width: 100%;">
+      <input type="text" id="pet-name-input" placeholder="给狗狗起个名字吧..." 
+             style="width: 100%; padding: 12px 16px; border-radius: 14px; border: 1px solid #ddd; margin-bottom: 16px; text-align: center; font-size: 15px; outline:none;">
+      <button class="btn" style="width: 100%; padding: 14px;" onclick="confirmAdoption()">开启陪伴之旅 ✨</button>
+    </div>
+  </div>
+  <!-- 顶部状态栏 -->
+  <div class="header-bar">
+    <div>
+      <div id="status-days" class="status-badge">🐾 已陪伴 0 天</div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+        <span id="status-level" style="font-size: 12px; font-weight: bold; color: var(--primary);">Lv.1 亲密度</span>
+        <div class="exp-bar-container"><div id="status-exp" class="exp-bar-fill"></div></div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <!-- PWA 一键安装按钮（当浏览器触发可安装事件时自动显现） -->
+      <button class="btn hidden" id="pwa-install-btn" style="padding: 6px 10px; font-size: 11px; background: linear-gradient(135deg, #6cb2eb 0%, #3b82f6 100%); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);" onclick="installPWAApp()">📲 安装</button>
+      <div style="background: #fff5e6; padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 13px; color: #d97706; border: 1px solid #ffe0b2;">
+        🪙 <span id="status-coins">100</span>
+      </div>
+      <button class="btn" id="checkin-btn" style="padding: 6px 12px; font-size: 12px;" onclick="dailyCheckIn()">签到</button>
+    </div>
+  </div>
+
+  <!-- 1. Home View -->
+  <div id="view-home" class="view-content">
+    <div class="pet-room" id="pet-room" onclick="handleFetchClick(event)" ontouchend="handleFetchTouch(event)">
+      <svg class="room-background-3d" viewBox="0 0 400 350" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e0f2fe"/>
+            <stop offset="100%" stop-color="#fff8f0"/>
+          </linearGradient>
+          <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#edd8c4"/>
+            <stop offset="100%" stop-color="#dcbfa6"/>
+          </linearGradient>
+        </defs>
+
+        <rect x="0" y="0" width="400" height="230" fill="url(#wallGrad)"/>
+        <rect x="130" y="30" width="140" height="110" rx="10" fill="#bae6fd" stroke="#ffffff" stroke-width="6"/>
+        <path d="M 130 90 A 70 40 0 0 0 270 90" fill="#86efac" />
+        <circle cx="230" cy="55" r="12" fill="#fde047" opacity="0.8"/>
+        <line x1="200" y1="30" x2="200" y2="140" stroke="#ffffff" stroke-width="4"/>
+        <line x1="130" y1="85" x2="270" y2="85" stroke="#ffffff" stroke-width="4"/>
+
+        <rect x="0" y="224" width="400" height="8" fill="#c7a785"/>
+        <polygon points="0,232 400,232 400,350 0,350" fill="url(#floorGrad)"/>
+        <line x1="80" y1="232" x2="20" y2="350" stroke="#c09f7d" stroke-width="1.5" opacity="0.5"/>
+        <line x1="200" y1="232" x2="200" y2="350" stroke="#c09f7d" stroke-width="1.5" opacity="0.5"/>
+        <line x1="320" y1="232" x2="380" y2="350" stroke="#c09f7d" stroke-width="1.5" opacity="0.5"/>
+        <ellipse cx="200" cy="285" rx="75" ry="20" fill="rgba(140,80,30,0.12)"/>
+      </svg>
+
+      <div class="dress-up-btn" onclick="openDressUpModal(event)">
+        <span>👗</span> 换装
+      </div>
+
+      <div class="chat-open-btn" onclick="openChatModal(event)"><span>💬</span> 聊聊</div>
+
+      <div id="room-decorations-layer" style="position:absolute; inset:0; pointer-events:none; z-index:4;"></div>
+
+      <div class="speech-bubble" id="pet-bubble">汪！主子今天记得点右上角签到哦~</div>
+      
+      <div class="pet-stage">
+        <div id="mouth-ball" style="position:absolute; width:30px; height:30px; display:none; z-index:12; pointer-events:none; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));"></div>
+        <div id="puppy-container" class="puppy-svg-container puppy-animation-bounce" style="left: calc(50% - 65px); top: calc(62% - 65px);" onclick="petPuppy(event)">
+          <svg id="puppy-svg" viewBox="0 0 100 100" width="100%" height="100%"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <div id="equipped-toy-tag" style="font-size:12px; font-weight:bold; color:var(--primary); background:var(--primary-light); padding:5px 14px; border-radius:14px; display:flex; align-items:center; gap:6px; cursor:pointer; border:1px solid var(--primary);" onclick="openToySelectModal()">
+      </div>
+      <button class="btn btn-secondary" id="toggle-decor-edit-btn" style="font-size:11px; padding:5px 12px;" onclick="toggleDecorEditMode()">🛠️ 开启布置模式</button>
+    </div>
+
+    <div class="action-grid">
+      <div class="action-btn" onclick="openFeedingModal()">
+        <span class="icon">🍖</span>
+        <span class="label">喂食</span>
+      </div>
+      <div class="action-btn" id="brush-action-btn" onclick="openBrushModal()">
+        <span class="icon">🪥</span>
+        <span class="label" id="brush-btn-label">刷牙</span>
+      </div>
+      <div class="action-btn" onclick="toggleSleep()">
+        <span class="icon">💤</span>
+        <span class="label" id="sleep-btn-label">睡觉</span>
+      </div>
+      <div class="action-btn" onclick="toggleFetchMode()">
+        <span class="icon" id="toy-action-icon">⚽</span>
+        <span class="label" id="fetch-btn-label">抛球模式</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Tasks View -->
+  <div id="view-tasks" class="view-content hidden">
+    <div class="card" id="alarm-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-weight:bold;font-size:16px;">⏰ 闹钟与提醒</span>
+        <button class="btn" id="notify-perm-btn" style="padding:5px 12px;font-size:12px;" onclick="enableNotifications()">🔔 开启通知</button>
+      </div>
+      <div id="notify-hint" style="font-size:11px;color:var(--text-sub);line-height:1.6;margin-bottom:12px;"></div>
+      <div id="notify-diag" style="display:none;font-size:12px;line-height:1.8;background:#fff7ee;border-radius:12px;padding:10px 12px;margin-bottom:12px;white-space:pre-line;user-select:text;-webkit-user-select:text;"></div>
+      <div class="alarm-row">
+        <div><div style="font-weight:bold;font-size:14px;">🌅 每日早安</div><div style="font-size:11px;color:var(--text-sub);">每天到点收到一条早安通知</div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="time" id="morning-time" value="00:01" onchange="setMorningTime(this.value)">
+          <label class="switch"><input type="checkbox" id="morning-toggle" onchange="toggleMorning(this.checked)"><span></span></label>
+        </div>
+      </div>
+      <div class="alarm-row">
+        <div style="min-width:0;"><div style="font-weight:bold;font-size:14px;">🐶 监督我完成目标</div><div style="font-size:11px;color:var(--text-sub);line-height:1.5;">白天每 2 小时催一次；晚上到右侧时间催，1 小时后再催一次就不再打扰</div></div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="time" id="nag-night-time" value="21:00" onchange="setNagNightTime(this.value)">
+          <label class="switch"><input type="checkbox" id="nag-toggle" onchange="toggleNag(this.checked)"><span></span></label>
+        </div>
+      </div>
+      <div id="alarm-list"></div>
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <input type="time" id="new-alarm-time" value="07:30">
+        <input type="text" id="new-alarm-label" placeholder="闹钟名称（如：起床）" style="flex:1;min-width:0;padding:8px 12px;border-radius:12px;font-size:13px;outline:none;">
+        <button class="btn" style="padding:6px 14px;font-size:12px;" onclick="addAlarm()">+ 添加</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-secondary" style="flex:1;font-size:12px;" onclick="testNotification()">📨 发送测试通知</button>
+        <button class="btn btn-secondary" style="flex:1;font-size:12px;" onclick="diagnoseNotifications()">🔍 通知诊断</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-weight: bold; font-size: 16px;">📋 每日打卡目标</span>
+        <button class="btn" style="padding: 4px 12px; font-size: 12px;" onclick="openAddTaskModal()">+ 添加目标</button>
+      </div>
+      <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 8px;">完成全天打卡额外奖励 +20 🪙</div>
+      <div id="task-list"></div>
+    </div>
+  </div>
+
+  <!-- 3. Mood Journal View -->
+  <div id="view-mood" class="view-content hidden">
+    <div class="card" style="background: linear-gradient(135deg, #fff2e8 0%, #fffdfa 100%);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+        <span style="font-size: 13px; font-weight: bold; color: var(--primary);">💬 每日暖心名句</span>
+        <button class="btn btn-secondary" style="font-size: 10px; padding: 2px 8px;" onclick="refreshRandomQuote()">🔄 换一句</button>
+      </div>
+      <div id="quote-display-box" style="font-size: 13px; font-style: italic; color: var(--text-main); padding: 10px; background: rgba(255,255,255,0.85); border-radius: 12px; border-left: 3.5px solid var(--primary); min-height: 48px; display: flex; align-items: center; justify-content: center; text-align: center;"></div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight: bold; font-size: 15px;">📝 记录心情日记</div>
+      
+      <div class="mood-grid-selector">
+        <div class="mood-chip selected" onclick="selectMoodChip('happy', '😊', '开心', event)">
+          <span style="font-size:18px;">😊</span><span>开心</span>
+        </div>
+        <div class="mood-chip" onclick="selectMoodChip('peaceful', '😌', '平静', event)">
+          <span style="font-size:18px;">😌</span><span>平静</span>
+        </div>
+        <div class="mood-chip" onclick="selectMoodChip('fulfilled', '💪', '充实', event)">
+          <span style="font-size:18px;">💪</span><span>充实</span>
+        </div>
+        <div class="mood-chip" onclick="selectMoodChip('tired', '😩', '疲惫', event)">
+          <span style="font-size:18px;">😩</span><span>疲惫</span>
+        </div>
+        <div class="mood-chip" onclick="selectMoodChip('anxious', '😰', '焦虑', event)">
+          <span style="font-size:18px;">😰</span><span>焦虑</span>
+        </div>
+        <div class="mood-chip" onclick="selectMoodChip('sad', '😢', '难过', event)">
+          <span style="font-size:18px;">😢</span><span>难过</span>
+        </div>
+        <div class="mood-chip" onclick="selectMoodChip('expectant', '🥳', '期待', event)">
+          <span style="font-size:18px;">🥳</span><span>期待</span>
+        </div>
+      </div>
+
+      <textarea id="mood-note-input" placeholder="今天有什么想记下来的事情或感受吗..." 
+                style="width: 100%; height: 65px; border-radius: 12px; border: 1px solid var(--border-color); padding: 10px; font-size: 13px; outline: none; margin-bottom: 10px;"></textarea>
+      <button class="btn" style="width: 100%;" onclick="saveMoodLog()">记录今天的心情 ✨</button>
+    </div>
+
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+        <span style="font-weight: bold; font-size: 15px;">📊 本地心情智能分析</span>
+        <div style="display:flex; gap: 4px;">
+          <button class="btn btn-secondary" id="mood-range-7" style="font-size:10px; padding:2px 8px; font-weight:bold; background:var(--primary-light); color:var(--primary);" onclick="setMoodAnalysisRange(7)">7 天</button>
+          <button class="btn btn-secondary" id="mood-range-30" style="font-size:10px; padding:2px 8px;" onclick="setMoodAnalysisRange(30)">30 天</button>
+        </div>
+      </div>
+      <div id="mood-analysis-box" style="background:#fdf5ef; padding:12px; border-radius:12px; font-size:12px; line-height:1.6; color:var(--text-main);"></div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight: bold; font-size: 15px; margin-bottom: 10px;">最近心情历史</div>
+      <div id="mood-history-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+    </div>
+  </div>
+
+  <!-- 4. Pomodoro Timer View -->
+  <div id="view-pomo" class="view-content hidden">
+    <div class="card" style="text-align: center;">
+      <div style="font-weight: bold; font-size: 16px; margin-bottom: 6px;">🍅 专注番茄钟</div>
+      <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 10px;">每完整专注 5 分钟可获得 1 个狗狗币 🪙</div>
+
+      <div style="margin-bottom: 12px;">
+        <input type="text" id="pomo-task-name" placeholder="输入本次专注任务名称 (如: 英语背诵)..." 
+               style="width: 85%; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 13px; text-align: center; outline: none;">
+      </div>
+
+      <div class="pomo-timer-display">
+        <div class="pomo-time-text" id="pomo-timer-text">25:00</div>
+        <div style="font-size: 11px; color: var(--primary); margin-top: 4px;" id="pomo-reward-hint">预计获得 5 🪙</div>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 10px;" onclick="setPomoPreset(15)">15 分钟</button>
+        <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 10px;" onclick="setPomoPreset(25)">25 分钟</button>
+        <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 10px;" onclick="setPomoPreset(45)">45 分钟</button>
+        <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 10px;" onclick="openCustomPomoModal()">自定义</button>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 12px;">
+        <button class="btn" id="pomo-start-btn" onclick="startPomoTimer()">▶️ 开始</button>
+        <button class="btn btn-secondary" id="pomo-pause-btn" onclick="pausePomoTimer()" disabled>⏸️ 暂停</button>
+        <button class="btn btn-secondary" id="pomo-reset-btn" onclick="resetPomoTimer()">🔄 重置</button>
+      </div>
+
+      <button class="btn btn-secondary" style="width: 100%; font-size: 12px;" onclick="openPomoHistoryModal()">📜 查看专注历史记录</button>
+    </div>
+  </div>
+
+  <!-- 5. Shop View -->
+  <div id="view-shop" class="view-content hidden">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-weight:bold; font-size:16px;">🛒 道具与好物商店</span>
+        <span style="font-size:12px; color:var(--text-sub);">狗狗币: <b id="shop-coin-balance" style="color:#d97706;">100</b> 🪙</span>
+      </div>
+      <div class="shop-tabs" style="display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px;">
+        <div class="shop-tab active" onclick="switchShopTab('outfit', event)">👗 服饰</div>
+        <div class="shop-tab" onclick="switchShopTab('food', event)">🍖 食物</div>
+        <div class="shop-tab" onclick="switchShopTab('brush', event)">🪥 牙刷</div>
+        <div class="shop-tab" onclick="switchShopTab('toy', event)">⚽ 玩具</div>
+        <div class="shop-tab" onclick="switchShopTab('home', event)">🏠 装饰</div>
+      </div>
+      <div id="shop-grid-container" class="shop-grid"></div>
+    </div>
+  </div>
+
+  <!-- 6. Achievements View -->
+  <div id="view-stats" class="view-content hidden">
+    <div class="card">
+      <div style="font-weight: bold; font-size: 16px; margin-bottom: 12px;">📊 陪伴历程面板</div>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 13px;">
+        <div style="background: #fdf5ef; padding: 10px; border-radius: 12px;">领养日期：<br><b id="stat-adopt-date">--</b></div>
+        <div style="background: #fdf5ef; padding: 10px; border-radius: 12px;">累计签到陪伴：<br><b id="stat-checkin-days">0 天</b></div>
+        <div style="background: #fdf5ef; padding: 10px; border-radius: 12px;">累计喂食次数：<br><b id="stat-feed-count">0 次</b></div>
+        <div style="background: #fdf5ef; padding: 10px; border-radius: 12px;">刷牙护理天数：<br><b id="stat-brush-count">0 天</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight: bold; font-size: 16px; margin-bottom: 12px;">🏆 徽章收藏室 / 成就墙</div>
+      
+      <div style="font-size: 13px; font-weight: bold; color: var(--primary); margin: 10px 0 6px 0;">🦷 牙齿健康系列</div>
+      <div id="badge-list-health" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;"></div>
+
+      <div style="font-size: 13px; font-weight: bold; color: var(--primary); margin: 14px 0 6px 0;">📅 签到陪伴系列</div>
+      <div id="badge-list-companion" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;"></div>
+
+      <div style="font-size: 13px; font-weight: bold; color: var(--primary); margin: 14px 0 6px 0;">❤️ 互动成就系列</div>
+      <div id="badge-list-interaction" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;"></div>
+    </div>
+
+    <div class="card" style="text-align: center;">
+      <button class="btn btn-secondary" style="width: 100%; color: var(--accent);" onclick="confirmResetData()">更换小狗 / 重置数据</button>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="nav-bar">
+    <div class="nav-item active" onclick="switchNav('home', event)">
+      <span class="icon">🏠</span><span>主页</span>
+    </div>
+    <div class="nav-item" onclick="switchNav('tasks', event)">
+      <span class="icon">✅</span><span>打卡</span>
+    </div>
+    <div class="nav-item" onclick="switchNav('mood', event)">
+      <span class="icon">📖</span><span>日记</span>
+    </div>
+    <div class="nav-item" onclick="switchNav('pomo', event)">
+      <span class="icon">🍅</span><span>番茄钟</span>
+    </div>
+    <div class="nav-item" onclick="switchNav('shop', event)">
+      <span class="icon">🛒</span><span>商城</span>
+    </div>
+    <div class="nav-item" onclick="switchNav('stats', event)">
+      <span class="icon">🏆</span><span>成就</span>
+    </div>
+  </div>
+
+  <!-- 👗 换装衣柜 Modal -->
+  <div id="dressup-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">👗 小狗专属衣柜</div>
+        <div class="close-btn" onclick="closeModal('dressup-modal')">✕</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span style="font-size: 12px; color: var(--text-sub);">点击已购买的服装即可穿戴：</span>
+        <button class="btn" style="padding: 4px 10px; font-size: 11px;" onclick="goToOutfitShop()">🛒 去商城买新衣</button>
+      </div>
+
+      <div style="font-weight:bold; font-size:13px; margin-top:8px;">👕 时尚服饰</div>
+      <div class="dress-grid" id="wardrobe-clothes-grid"></div>
+
+      <div style="font-weight:bold; font-size:13px; margin-top:14px;">👓 眼镜配饰</div>
+      <div class="dress-grid" id="wardrobe-glasses-grid"></div>
+    </div>
+  </div>
+
+  <!-- Toothbrushing Modal -->
+  <div id="brush-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="max-width: 440px; padding: 16px;">
+      <div class="modal-header" style="margin-bottom: 10px;">
+        <div class="modal-title">🪥 狗狗刷牙时间</div>
+        <div class="close-btn" onclick="closeModal('brush-modal')">✕</div>
+      </div>
+      <p style="font-size: 12px; color: #666; margin-bottom: 10px; text-align: center;">移动牙刷刷洗牙齿表面附着的污垢，恢复狗狗洁白牙齿！</p>
+      
+      <div class="brush-stage" id="brush-stage" 
+           onmousemove="handleBrushMove(event)" 
+           ontouchmove="handleBrushMoveTouch(event)">
+        <div class="custom-cursor-brush" id="brush-cursor" style="width: 70px; height: 70px;"></div>
+        
+        <svg class="mouth-open-svg" viewBox="0 0 240 200">
+          <!-- 毛茸茸吻部背景 -->
+          <ellipse cx="120" cy="95" rx="95" ry="82" fill="#d99b52" />
+          <ellipse cx="120" cy="112" rx="76" ry="64" fill="#edd1b0" />
+          <!-- 小狗黑鼻子 -->
+          <path d="M 102 36 Q 120 26 138 36 Q 134 54 120 56 Q 106 54 102 36 Z" fill="#2b211e" />
+          <ellipse cx="113" cy="37" rx="4" ry="2.2" fill="#ffffff" opacity="0.45" />
+          <circle cx="111" cy="46" r="2.8" fill="#140e0c" />
+          <circle cx="129" cy="46" r="2.8" fill="#140e0c" />
+
+          <!-- 口腔内部与翻开的上唇 -->
+          <path d="M 52 92 Q 120 52 188 92 Q 182 162 120 166 Q 58 162 52 92 Z" fill="#4a151b" stroke="#2c221e" stroke-width="3"/>
+          <!-- 粉色上牙龈 -->
+          <path d="M 62 94 Q 120 68 178 94 Q 172 112 120 106 Q 68 112 62 94 Z" fill="#ff8fa3" />
+          <!-- 粉色下牙龈与舌头 -->
+          <path d="M 68 140 Q 120 124 172 140 Q 162 162 120 164 Q 78 162 68 140 Z" fill="#ff758f" />
+          <path d="M 88 144 Q 120 132 152 144 Q 142 162 120 162 Q 98 162 88 144 Z" fill="#ff4d6d" opacity="0.85" />
+
+          <!-- 上排牙齿：两颗标志性长尖犬牙 + 6颗整齐小门牙 -->
+          <g id="teeth-top" stroke="#d8d2c7" stroke-width="1.2" stroke-linejoin="round">
+            <path d="M 68 95 Q 64 122 72 136 Q 82 120 82 97 Z" fill="#ffffff" />
+            <path d="M 84 96 L 94 96 L 93 114 Q 89 117 85 114 Z" fill="#ffffff" />
+            <path d="M 96 95 L 106 95 L 105 115 Q 101 118 97 115 Z" fill="#ffffff" />
+            <path d="M 108 94 L 119 94 L 118 116 Q 113.5 119 109 116 Z" fill="#ffffff" />
+            <path d="M 121 94 L 132 94 L 131 116 Q 126.5 119 122 116 Z" fill="#ffffff" />
+            <path d="M 134 95 L 144 95 L 143 115 Q 139 118 135 115 Z" fill="#ffffff" />
+            <path d="M 146 96 L 156 96 L 155 114 Q 151 117 147 114 Z" fill="#ffffff" />
+            <path d="M 158 97 Q 158 120 168 136 Q 176 122 172 95 Z" fill="#ffffff" />
+          </g>
+
+          <!-- 下排牙齿：两侧下尖牙 + 细小下门牙 -->
+          <g id="teeth-bottom" stroke="#d8d2c7" stroke-width="1.2" stroke-linejoin="round">
+            <path d="M 75 142 Q 74 126 81 118 Q 87 128 86 142 Z" fill="#ffffff" />
+            <rect x="89" y="130" width="9" height="12" rx="3" fill="#ffffff" />
+            <rect x="100" y="130" width="9" height="12" rx="3" fill="#ffffff" />
+            <rect x="111" y="130" width="8" height="12" rx="3" fill="#ffffff" />
+            <rect x="121" y="130" width="8" height="12" rx="3" fill="#ffffff" />
+            <rect x="131" y="130" width="9" height="12" rx="3" fill="#ffffff" />
+            <rect x="142" y="130" width="9" height="12" rx="3" fill="#ffffff" />
+            <path d="M 154 142 Q 153 128 159 118 Q 166 126 165 142 Z" fill="#ffffff" />
+          </g>
+        </svg>
+
+        <div id="dirt-spots-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Badge Detail -->
+  <div id="badge-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="text-align: center;">
+      <div class="modal-header">
+        <div class="modal-title">🏆 勋章详情</div>
+        <div class="close-btn" onclick="closeModal('badge-modal')">✕</div>
+      </div>
+      <div id="badge-detail-icon" style="width: 80px; height: 80px; margin: 10px auto;"></div>
+      <div id="badge-detail-title" style="font-weight: bold; font-size: 18px; margin-top: 8px;"></div>
+      <div id="badge-detail-desc" style="font-size: 13px; color: #666; margin: 8px 0 6px 0;"></div>
+      <div id="badge-detail-progress" style="font-size: 12px; color: var(--primary); font-weight: bold; margin-bottom: 12px;"></div>
+      <div id="badge-detail-date" style="font-size: 12px; color: var(--primary); font-weight: bold; background: var(--primary-light); padding: 6px 12px; border-radius: 20px; display: inline-block;"></div>
+    </div>
+  </div>
+
+  <!-- Feeding Modal -->
+  <div id="feeding-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">🍖 选择喂食食物</div>
+        <div class="close-btn" onclick="closeModal('feeding-modal')">✕</div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span style="font-size: 12px; color: var(--text-sub);">库存永久保留，用完可去商城购买：</span>
+        <button class="btn" style="padding: 4px 10px; font-size: 11px;" onclick="goToFoodShop()">🛒 买食物</button>
+      </div>
+      <div id="feeding-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div id="add-task-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">📝 添加打卡目标</div>
+        <div class="close-btn" onclick="closeModal('add-task-modal')">✕</div>
+      </div>
+      <input type="text" id="add-task-input" placeholder="输入新的打卡目标..." style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 14px; font-size: 14px; outline: none;">
+      <button class="btn" style="width: 100%;" onclick="saveNewTask()">保存打卡目标</button>
+    </div>
+  </div>
+
+  <!-- Custom Pomodoro Modal -->
+  <div id="custom-pomo-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">⏱️ 自定义专注时长</div>
+        <div class="close-btn" onclick="closeModal('custom-pomo-modal')">✕</div>
+      </div>
+      <div style="font-size: 13px; color: var(--text-sub); margin-bottom: 10px;">请输入专注分钟数（1 ~ 180分钟）：</div>
+      <input type="number" id="custom-pomo-input" placeholder="分钟数 (例如 30)" min="1" max="180" style="width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 14px; font-size: 14px; outline: none;">
+      <button class="btn" style="width: 100%;" onclick="confirmCustomPomo()">确定并设置</button>
+    </div>
+  </div>
+
+  <!-- 🎧 专注音效与白噪音设置 Modal -->
+  <div id="pomo-audio-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">🎧 专注白噪音调音台</div>
+        <div class="close-btn" onclick="closeModal('pomo-audio-modal')">✕</div>
+      </div>
+      <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 14px; text-align: center;">调整您喜爱的背景声音大小（支持多重叠加）：</div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; max-height: 280px; overflow-y: auto; padding-right: 4px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 13px; font-weight: bold; width: 85px;">🌧️ 柔和细雨</span>
+          <input type="range" id="vol-rain" min="0" max="100" value="40" style="flex: 1; accent-color: var(--primary);">
+          <span id="val-rain" style="font-size: 11px; width: 35px; text-align: right; color: var(--text-sub);">40%</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 13px; font-weight: bold; width: 85px;">🍃 微风树叶</span>
+          <input type="range" id="vol-wind" min="0" max="100" value="30" style="flex: 1; accent-color: var(--primary);">
+          <span id="val-wind" style="font-size: 11px; width: 35px; text-align: right; color: var(--text-sub);">30%</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 13px; font-weight: bold; width: 85px;">🔥 温暖篝火</span>
+          <input type="range" id="vol-fire" min="0" max="100" value="30" style="flex: 1; accent-color: var(--primary);">
+          <span id="val-fire" style="font-size: 11px; width: 35px; text-align: right; color: var(--text-sub);">30%</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 13px; font-weight: bold; width: 85px;">🌊 舒缓海浪</span>
+          <input type="range" id="vol-wave" min="0" max="100" value="35" style="flex: 1; accent-color: var(--primary);">
+          <span id="val-wave" style="font-size: 11px; width: 35px; text-align: right; color: var(--text-sub);">35%</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 13px; font-weight: bold; width: 85px;">📖 静谧翻书</span>
+          <input type="range" id="vol-book" min="0" max="100" value="20" style="flex: 1; accent-color: var(--primary);">
+          <span id="val-book" style="font-size: 11px; width: 35px; text-align: right; color: var(--text-sub);">20%</span>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <span style="font-size: 13px; font-weight: bold; width: 85px;">📻 纯白噪音</span>
+          <input type="range" id="vol-noise" min="0" max="100" value="0" style="flex: 1; accent-color: var(--primary);">
+          <span id="val-noise" style="font-size: 11px; width: 35px; text-align: right; color: var(--text-sub);">0%</span>
+        </div>
+      </div>
+
+      <button class="btn" style="width: 100%;" onclick="confirmAndStartPomoWithAudio()">🎧 开启专注并播放音效</button>
+    </div>
+  </div>
+
+  <!-- Pomodoro History Modal -->
+  <div id="pomo-history-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">📜 专注历史记录</div>
+        <div class="close-btn" onclick="closeModal('pomo-history-modal')">✕</div>
+      </div>
+      <div id="pomo-history-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; margin-bottom: 12px;"></div>
+      <button class="btn btn-secondary" style="width: 100%; color: var(--accent);" onclick="clearPomoHistory()">清空历史记录</button>
+    </div>
+  </div>
+
+  <!-- 🎾 玩具装备选择 Modal -->
+  <div id="toy-select-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">🎾 选择装备玩具</div>
+        <div class="close-btn" onclick="closeModal('toy-select-modal')">✕</div>
+      </div>
+      <div style="font-size: 12px; color: var(--text-sub); margin-bottom: 10px;">选择一个已拥有的玩具，抛球互动时将使用该道具：</div>
+      <div id="toy-select-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto;"></div>
+    </div>
+  </div>
+
+  <!-- 💬 和小狗聊天 -->
+  <div id="chat-modal" class="modal-overlay hidden">
+    <div class="modal-card chat-card">
+      <div class="chat-head">
+        <div class="chat-avatar">🐶</div>
+        <div style="flex:1;min-width:0;">
+          <div id="chat-title" style="font-weight:800;font-size:16px;">小狗</div>
+          <div id="chat-mode" style="font-size:11px;color:var(--text-sub);"></div>
+        </div>
+        <div class="close-btn" onclick="toggleChatSettings()" title="设置">⚙</div>
+        <div class="close-btn" onclick="closeModal('chat-modal')">✕</div>
+      </div>
+      <div id="chat-settings" class="hidden">
+        <div style="font-size:11px;color:var(--text-sub);line-height:1.6;margin-bottom:6px;">填入你的 AI 代理地址（见 worker.js）后，小狗会用真正的 AI 聊天；留空则使用内置的离线性格模式。</div>
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="chat-api-url" placeholder="https://xxx.workers.dev" style="flex:1;min-width:0;padding:8px 12px;border-radius:12px;font-size:13px;outline:none;">
+          <button class="btn" style="padding:6px 14px;font-size:12px;" onclick="saveChatApiUrl()">保存</button>
+        </div>
+      </div>
+      <div id="chat-list" class="chat-list"></div>
+      <div class="chat-chips" id="chat-chips"></div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" placeholder="和小狗说点什么…" maxlength="200" onkeydown="if(event.key==='Enter'&&!event.isComposing)sendChat()">
+        <button class="btn" style="padding:10px 18px;" onclick="sendChat()">发送</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自定义确认重置弹窗 -->
+  <div id="confirm-reset-modal" class="modal-overlay hidden">
+    <div class="modal-card" style="text-align: center;">
+      <div class="modal-header">
+        <div class="modal-title">⚠️ 重置数据确认</div>
+        <div class="close-btn" onclick="closeModal('confirm-reset-modal')">✕</div>
+      </div>
+      <p style="font-size: 14px; color: var(--text-main); margin-bottom: 20px;">确定要重置所有数据并重新选择小狗吗？此操作无法撤销哦。</p>
+      <div style="display: flex; gap: 10px;">
+        <button class="btn btn-secondary" style="flex: 1;" onclick="closeModal('confirm-reset-modal')">取消</button>
+        <button class="btn" style="flex: 1; background: var(--accent);" onclick="executeResetData()">确定重置</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DB_NAME = 'VirtualPuppyDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'app_state';
+const STATE_KEY = 'current_puppy_state';
+
+let dbInstance = null;
+let isFetchMode = false;
+let isDogMoving = false;
+let remainingDirt = 0;
+let currentSelectedBreed = 'golden';
+let activeShopTab = 'outfit';
+
+const BREED_STYLES = {
+  golden: { main: '#e29b38', ear: '#c47d1e', name: '金毛寻回犬' },
+  corgi:  { main: '#d97724', ear: '#9e4b00', name: '柯基犬' },
+  samoyed:{ main: '#e8e8e8', ear: '#d0d0d0', name: '萨摩耶' },
+  shiba:  { main: '#c86d27', ear: '#8c430e', name: '柴犬' },
+  bichon: { main: '#f0f0f0', ear: '#d8d8d8', name: '比熊犬' }
+};
+
+const BUILTIN_QUOTES = [
+  "每一个不曾起舞的日子，都是对生命的辜负。—— 尼采",
+  "生活原本沉闷，但跑起来就有风。—— 网络语录",
+  "你若盛开，清风自来；心若浮沉，浅笑安然。",
+  "愿你精致到老，眼里长着太阳，笑里全是坦荡。",
+  "世界上只有一种真正的英雄主义，那就是认清生活的真相后依然热爱生活。—— 罗曼·罗兰",
+  "生命中所有的灿烂，终究都需要用寂寞来偿还。—— 马尔克斯",
+  "心如花木，向阳而生。",
+  "凡是过往，皆为序章。—— 莎士比亚",
+  "所有的惊喜和好运，都是你积攒的温柔和善良。",
+  "无论前路多远，狗狗会一直陪着你。"
+];
+
+const BADGES_DATABASE = {
+  health: [
+    { id: 'brush_7', name: '每日刷牙达人', icon: '🪥', desc: '连续刷牙护理达到 7 天', category: 'health', target: 7 },
+    { id: 'brush_30', name: '洁白守护者', icon: '✨', desc: '连续刷牙护理达到 30 天', category: 'health', target: 30 },
+    { id: 'brush_100', name: '口腔小卫士', icon: '🏆', desc: '累计刷牙护理达到 100 次', category: 'health', target: 100 }
+  ],
+  companion: [
+    { id: 'companion_7', name: '每周陪伴', icon: '📅', desc: '累计签到陪伴满 7 天', category: 'companion', target: 7 },
+    { id: 'companion_30', name: '月度伙伴', icon: '🌟', desc: '累计签到陪伴满 30 天', category: 'companion', target: 30 },
+    { id: 'companion_90', name: '季度同行', icon: '💫', desc: '累计签到陪伴满 90 天', category: 'companion', target: 90 }
+  ],
+  interaction: [
+    { id: 'first_meet', name: '初次见面', icon: '🐾', desc: '成功领养专属小狗', category: 'interaction', target: 1 },
+    { id: 'feed_50', name: '喂食小能手', icon: '🍖', desc: '累计喂食达成 50 次', category: 'interaction', target: 50 },
+    { id: 'fetch_50', name: '抛球高手', icon: '🎾', desc: '陪小狗进行抛球互动 50 次', category: 'interaction', target: 50 }
+  ]
+};
+
+const MOOD_TYPES = {
+  happy: { emoji: '😊', label: '开心', score: 2 },
+  peaceful: { emoji: '😌', label: '平静', score: 1 },
+  fulfilled: { emoji: '💪', label: '充实', score: 2 },
+  tired: { emoji: '😩', label: '疲惫', score: -1 },
+  anxious: { emoji: '😰', label: '焦虑', score: -2 },
+  sad: { emoji: '😢', label: '难过', score: -2 },
+  expectant: { emoji: '🥳', label: '期待', score: 2 }
+};
+
+let selectedMoodKey = 'happy';
+let currentAnalysisRange = 7;
+let isDecorEditMode = false;
+let badgeToastQueue = [];
+let isShowingBadgeToast = false;
+
+const SVG_MODEL_FACTORY = {
+  // 👗 服饰与眼镜图标预览
+  outfit_red_shirt: `<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M 8 14 L 14 10 Q 20 14 26 10 L 32 14 L 35 22 L 29 24 L 28 34 L 12 34 L 11 24 L 5 22 Z" fill="#ef4444"/><path d="M 20 18 Q 17 21 15 23 L 20 27 L 25 23 Q 23 21 20 18 Z" fill="#ffffff" opacity="0.9"/></svg>`,
+  outfit_bowtie: `<svg viewBox="0 0 40 40" width="100%" height="100%"><polygon points="6,12 20,20 6,28" fill="#1e293b"/><polygon points="34,12 20,20 34,28" fill="#1e293b"/><rect x="17" y="16" width="6" height="8" rx="2" fill="#e11d48"/></svg>`,
+  outfit_sailor: `<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M 8 14 L 32 14 L 34 32 L 6 32 Z" fill="#3b82f6"/><polygon points="10,14 20,24 30,14" fill="#ffffff"/><polygon points="18,22 22,22 20,29" fill="#ef4444"/></svg>`,
+  outfit_duck_hoodie: `<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M 8 14 L 32 14 L 34 34 L 6 34 Z" fill="#facc15"/><circle cx="20" cy="24" r="5" fill="#fef08a"/><polygon points="17,24 23,24 20,27" fill="#f97316"/></svg>`,
+  outfit_sunglasses: `<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="4" y="14" width="13" height="10" rx="3" fill="#1e293b"/><rect x="23" y="14" width="13" height="10" rx="3" fill="#1e293b"/><line x1="17" y1="17" x2="23" y2="17" stroke="#1e293b" stroke-width="2.5"/></svg>`,
+  outfit_reading: `<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="11" cy="20" r="7" fill="none" stroke="#475569" stroke-width="2.5"/><circle cx="29" cy="20" r="7" fill="none" stroke="#475569" stroke-width="2.5"/><line x1="18" y1="20" x2="22" y2="20" stroke="#475569" stroke-width="2.5"/></svg>`,
+
+  // 🪥 牙刷
+  brush_default: `<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="18" y="4" width="4" height="30" rx="2" fill="#6cb2eb"/><rect x="16" y="4" width="8" height="10" rx="2" fill="#ffffff" stroke="#6cb2eb" stroke-width="1"/><line x1="18" y1="6" x2="18" y2="12" stroke="#6cb2eb" stroke-width="1.5"/><line x1="22" y1="6" x2="22" y2="12" stroke="#6cb2eb" stroke-width="1.5"/></svg>`,
+  brush_gold: `<svg viewBox="0 0 40 40" width="100%" height="100%"><defs><linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe066"/><stop offset="50%" stop-color="#ffd700"/><stop offset="100%" stop-color="#b8860b"/></linearGradient></defs><rect x="18" y="4" width="4" height="30" rx="2" fill="url(#gGrad)" stroke="#DAA520" stroke-width="0.5"/><rect x="15" y="4" width="10" height="10" rx="2" fill="#fffdf0" stroke="#ffd700" stroke-width="1"/><line x1="18" y1="6" x2="18" y2="12" stroke="#ffd700" stroke-width="1.5"/><line x1="22" y1="6" x2="22" y2="12" stroke="#ffd700" stroke-width="1.5"/></svg>`,
+  brush_blue: `<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="18" y="4" width="4" height="30" rx="2" fill="#3b82f6"/><rect x="16" y="4" width="8" height="10" rx="2" fill="#ffffff" stroke="#3b82f6" stroke-width="1"/></svg>`,
+  brush_pink: `<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="18" y="4" width="4" height="30" rx="2" fill="#ec4899"/><rect x="16" y="4" width="8" height="10" rx="2" fill="#ffffff" stroke="#ec4899" stroke-width="1"/></svg>`,
+
+  // ⚽ 玩具
+  ball: `<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="16" fill="#84cc16"/><path d="M 8 20 A 12 12 0 0 1 32 20 M 8 20 A 12 12 0 0 0 32 20" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/></svg>`,
+  frisbee: `<svg viewBox="0 0 40 40" width="100%" height="100%"><ellipse cx="20" cy="20" rx="18" ry="9" fill="#06b6d4" stroke="#0891b2" stroke-width="2"/><ellipse cx="20" cy="18" rx="14" ry="6" fill="#67e8f9" opacity="0.6"/></svg>`,
+  bone: `<svg viewBox="0 0 40 40" width="100%" height="100%"><g fill="#fef3c7" stroke="#d97706" stroke-width="1.5"><circle cx="10" cy="15" r="5"/><circle cx="10" cy="25" r="5"/><circle cx="30" cy="15" r="5"/><circle cx="30" cy="25" r="5"/><rect x="10" y="16" width="20" height="8" rx="2"/></g></svg>`,
+  rope: `<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M 8 32 C 16 24 24 16 32 8" stroke="#f97316" stroke-width="6" stroke-linecap="round"/><circle cx="14" cy="26" r="4" fill="#ea580c"/><circle cx="26" cy="14" r="4" fill="#ea580c"/></svg>`,
+  rubber_ball: `<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="16" fill="#a855f7"/><circle cx="14" cy="14" r="4" fill="#e9d5ff" opacity="0.7"/></svg>`,
+
+  // 🍖 食物
+  dogfood: `<svg viewBox="0 0 40 40" width="100%" height="100%"><ellipse cx="20" cy="26" rx="16" ry="8" fill="#a16207"/><ellipse cx="20" cy="22" rx="16" ry="8" fill="#ca8a04"/></svg>`,
+  freeze_dried: `<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="8" y="10" width="24" height="22" rx="4" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/></svg>`,
+  duck_meat: `<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M 8 24 Q 20 12 32 24 Q 20 32 8 24 Z" fill="#b91c1c" stroke="#7f1d1d" stroke-width="1.5"/></svg>`,
+  canned: `<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="10" y="12" width="20" height="20" rx="3" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/><rect x="10" y="16" width="20" height="12" fill="#ef4444"/></svg>`,
+  snack: `<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="14" fill="#f97316" stroke="#c2410c" stroke-width="1.5"/></svg>`,
+
+  // 🏠 装饰
+  plant: `<svg viewBox="0 0 60 70" width="100%" height="100%"><path d="M 20 40 L 40 40 L 36 65 L 24 65 Z" fill="#d97706"/><path d="M 15 35 Q 30 10 30 40" stroke="#16a34a" stroke-width="8" stroke-linecap="round" fill="none"/></svg>`,
+  table: `<svg viewBox="0 0 70 50" width="100%" height="100%"><ellipse cx="35" cy="15" rx="32" ry="10" fill="#b45309" stroke="#78350f" stroke-width="2"/><rect x="12" y="15" width="6" height="30" fill="#78350f"/><rect x="52" y="15" width="6" height="30" fill="#78350f"/></svg>`,
+  rug: `<svg viewBox="0 0 100 50" width="100%" height="100%"><ellipse cx="50" cy="25" rx="46" ry="20" fill="#fbcfe8" stroke="#f472b6" stroke-width="3" stroke-dasharray="6,4"/></svg>`,
+  star_light: `<svg viewBox="0 0 40 60" width="100%" height="100%"><line x1="20" y1="0" x2="20" y2="25" stroke="#fde047" stroke-width="2"/><polygon points="20,20 23,27 30,27 24,31 26,38 20,33 14,38 16,31 10,27 17,27" fill="#facc15" stroke="#eab308" stroke-width="1.5"/></svg>`,
+  dog_house: `<svg viewBox="0 0 70 60" width="100%" height="100%"><polygon points="35,5 5,28 65,28" fill="#ea580c"/><rect x="10" y="28" width="50" height="28" fill="#fef3c7" stroke="#d97706" stroke-width="2"/></svg>`
+};
+
+const ITEMS_DB = {
+  outfit: [
+    { id: 'outfit_red_shirt', outfitType: 'clothes', outfitVal: 'red_shirt', name: '爱心红卫衣', price: 60, desc: '温暖喜庆的红色卫衣' },
+    { id: 'outfit_bowtie', outfitType: 'clothes', outfitVal: 'bowtie', name: '绅士领结', price: 50, desc: '优雅帅气的黑色领结' },
+    { id: 'outfit_sailor', outfitType: 'clothes', outfitVal: 'sailor', name: '蓝白水手服', price: 80, desc: '清新可爱的海军风套装' },
+    { id: 'outfit_duck_hoodie', outfitType: 'clothes', outfitVal: 'duck_hoodie', name: '软萌小黄鸭', price: 100, desc: '元气满满的小黄鸭套衫' },
+    { id: 'outfit_sunglasses', outfitType: 'glasses', outfitVal: 'sunglasses', name: '酷炫墨镜', price: 45, desc: '出街必备拉风黑墨镜' },
+    { id: 'outfit_reading', outfitType: 'glasses', outfitVal: 'reading', name: '学霸眼镜', price: 40, desc: '斯文乖巧的细框眼镜' }
+  ],
+  food: [
+    { id: 'dogfood', name: '标准狗粮', price: 15, exp: 10, mood: 5, packSize: 10, desc: '买1份得10个，基础好狗粮' },
+    { id: 'freeze_dried', name: '冻干零食', price: 25, exp: 15, mood: 10, packSize: 10, desc: '买1份得10个，肉香嘎嘣脆' },
+    { id: 'duck_meat', name: '鸭胸肉', price: 35, exp: 22, mood: 12, packSize: 10, desc: '买1份得10个，降火清淡美味' },
+    { id: 'canned', name: '高级罐头', price: 50, exp: 35, mood: 15, packSize: 10, desc: '买1份得10个，营养软罐头' },
+    { id: 'snack', name: '小零食饼干', price: 20, exp: 12, mood: 8, packSize: 10, desc: '买1份得10个，奖励小饼干' }
+  ],
+  brush: [
+    { id: 'brush_default', name: '基础蓝牙刷', price: 0, desc: '标配清洁牙刷' },
+    { id: 'brush_pink', name: '粉嫩软毛牙刷', price: 60, desc: '软萌可爱柄' },
+    { id: 'brush_blue', name: '深海蓝牙刷', price: 60, desc: '清爽舒适柄' },
+    { id: 'brush_gold', name: '黄金尊贵牙刷', price: 300, desc: '金闪闪洁牙更高效！' }
+  ],
+  toy: [
+    { id: 'ball', name: '绿色网球', price: 0, desc: '经典弹力网球' },
+    { id: 'frisbee', name: '运动飞盘', price: 80, desc: '户外高空飞盘' },
+    { id: 'bone', name: '磨牙骨头', price: 60, desc: '耐咬解闷骨头' },
+    { id: 'rope', name: '拉扯绳结', price: 70, desc: '解压拔河绳结' },
+    { id: 'rubber_ball', name: '炫彩橡胶球', price: 90, desc: '超高弹力球' }
+  ],
+  home: [
+    { id: 'plant', name: '治愈绿植', price: 100, desc: '为房间增添生机', defaultX: 40, defaultY: 150 },
+    { id: 'table', name: '暖木小桌', price: 150, desc: '温馨木制桌子', defaultX: 290, defaultY: 160 },
+    { id: 'rug', name: '粉萌小地毯', price: 120, desc: '狗狗最爱趴在上面', defaultX: 150, defaultY: 220 },
+    { id: 'star_light', name: '温馨星星灯', price: 180, desc: '挂在墙上的柔光灯', defaultX: 50, defaultY: 40 },
+    { id: 'dog_house', name: '室内小木窝', price: 250, desc: '舒适有安全感的小窝', defaultX: 300, defaultY: 180 }
+  ]
+};
+
+const DEFAULT_STATE = {
+  adopted: false,
+  breed: 'golden',
+  name: '小狗',
+  adoptDate: '',
+  coins: 100,
+  level: 1,
+  exp: 0,
+  maxExp: 100,
+  lastCheckIn: '',
+  checkInDates: [],
+  isSleeping: false,
+  hasFedToday: false,
+  canBrush: false,
+  equippedToy: 'ball',
+  equippedBrush: 'brush_default',
+  outfitGlasses: 'none',
+  outfitClothes: 'none',
+  
+  feedCount: 0,
+  brushDays: 0,
+  playCount: 0,
+  maxStreak: 1,
+  lastBrushedDate: '',
+
+  todayDate: '',
+  // ✅ 食物库存永久累计：初始默认仅标准狗粮 10 个，其余为 0，跨天不自动重置
+  foodStock: { dogfood: 10, freeze_dried: 0, duck_meat: 0, canned: 0, snack: 0 },
+  inventory: ['ball', 'brush_default'],
+  placedDecorations: {},
+
+  tasks: [
+    { id: 1, text: '背 20 个单词 📖', done: false },
+    { id: 2, text: '喝满 1500ml 水 💧', done: false },
+    { id: 3, text: '坚持运动 30 分钟 🏃', done: false }
+  ],
+
+  quotesReadHistory: [],
+  moodLogs: [],
+  unlockedBadges: {},
+  activeDates: [],
+  pomoHistory: [],
+  alarms: [],
+  morningEnabled: true,
+  morningTime: '00:01',
+  lastMorningDate: '',
+  nagEnabled: true,
+  nagNightTime: '21:00',
+  nagDate: '',
+  nagNightCount: 0,
+  lastNightNagAt: 0,
+  lastDayNag: 0,
+  lastSeen: 0,
+  chatLog: [],
+  chatApiUrl: '',
+  lastChatExpDate: ''
+};
+
+let state = { ...DEFAULT_STATE };
+let pomoTimerInterval = null;
+let pomoSecondsLeft = 25 * 60;
+let pomoTotalDuration = 25 * 60;
+let isPomoRunning = false;
+
+// Web Audio Ambient Synthesizer
+let audioCtx = null;
+let soundNodes = { rain: null, wind: null, fire: null, wave: null, book: null, noise: null };
+
+function initAudioContext() {
+  if (!audioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) audioCtx = new AudioContext();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function createNoiseNode(type = 'white') {
+  if (!audioCtx) return null;
+  const bufferSize = 2 * audioCtx.sampleRate;
+  const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const output = noiseBuffer.getChannelData(0);
+
+  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+  for (let i = 0; i < bufferSize; i++) {
+    const white = Math.random() * 2 - 1;
+    if (type === 'pink') {
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+      output[i] *= 0.11;
+      b6 = white * 0.115926;
+    } else if (type === 'brown') {
+      b0 = (b0 + (0.02 * white)) / 1.02;
+      output[i] = b0 * 3.5;
+    } else {
+      output[i] = white * 0.15;
+    }
+  }
+
+  const whiteNoise = audioCtx.createBufferSource();
+  whiteNoise.buffer = noiseBuffer;
+  whiteNoise.loop = true;
+  return whiteNoise;
+}
+
+function startRainAudio(volume) {
+  if (volume <= 0 || !audioCtx) return null;
+  const noiseSource = createNoiseNode('pink');
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(600, audioCtx.currentTime);
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(volume * 0.45, audioCtx.currentTime);
+  noiseSource.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  noiseSource.start();
+  return { source: noiseSource, gain: gain };
+}
+
+function startWindAudio(volume) {
+  if (volume <= 0 || !audioCtx) return null;
+  const noiseSource = createNoiseNode('pink');
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(350, audioCtx.currentTime);
+  filter.Q.setValueAtTime(3.0, audioCtx.currentTime);
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(volume * 0.35, audioCtx.currentTime);
+  
+  const osc = audioCtx.createOscillator();
+  osc.frequency.setValueAtTime(0.2, audioCtx.currentTime);
+  const oscGain = audioCtx.createGain();
+  oscGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+  osc.connect(oscGain);
+  oscGain.connect(gain.gain);
+  osc.start();
+
+  noiseSource.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  noiseSource.start();
+  return { source: noiseSource, gain: gain, extraOsc: osc };
+}
+
+function startFireAudio(volume) {
+  if (volume <= 0 || !audioCtx) return null;
+  const noiseSource = createNoiseNode('brown');
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(500, audioCtx.currentTime);
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(volume * 0.4, audioCtx.currentTime);
+  noiseSource.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  noiseSource.start();
+  return { source: noiseSource, gain: gain };
+}
+
+function startWaveAudio(volume) {
+  if (volume <= 0 || !audioCtx) return null;
+  const noiseSource = createNoiseNode('brown');
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+  const gain = audioCtx.createGain();
+  
+  const lfo = audioCtx.createOscillator();
+  lfo.frequency.setValueAtTime(0.08, audioCtx.currentTime);
+  const lfoGain = audioCtx.createGain();
+  lfoGain.gain.setValueAtTime(volume * 0.3, audioCtx.currentTime);
+  lfo.connect(lfoGain);
+  lfoGain.connect(gain.gain);
+  lfo.start();
+
+  gain.gain.setValueAtTime(volume * 0.3, audioCtx.currentTime);
+  noiseSource.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  noiseSource.start();
+  return { source: noiseSource, gain: gain, extraOsc: lfo };
+}
+
+function startBookAudio(volume) {
+  if (volume <= 0 || !audioCtx) return null;
+  const noiseSource = createNoiseNode('white');
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(1200, audioCtx.currentTime);
+  filter.Q.setValueAtTime(2.5, audioCtx.currentTime);
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(volume * 0.3, audioCtx.currentTime);
+  noiseSource.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  noiseSource.start();
+  return { source: noiseSource, gain: gain };
+}
+
+function startWhiteNoiseAudio(volume) {
+  if (volume <= 0 || !audioCtx) return null;
+  const noiseSource = createNoiseNode('white');
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(volume * 0.3, audioCtx.currentTime);
+  noiseSource.connect(gain);
+  gain.connect(audioCtx.destination);
+  noiseSource.start();
+  return { source: noiseSource, gain: gain };
+}
+
+function stopAmbientAudio() {
+  ['rain', 'wind', 'fire', 'wave', 'book', 'noise'].forEach(key => {
+    if (soundNodes[key]) {
+      try {
+        soundNodes[key].source.stop();
+        soundNodes[key].source.disconnect();
+        if (soundNodes[key].extraOsc) {
+          soundNodes[key].extraOsc.stop();
+          soundNodes[key].extraOsc.disconnect();
+        }
+      } catch(e){}
+      soundNodes[key] = null;
+    }
+  });
+}
+
+function updateAudioVolumeSliders() {
+  ['rain', 'wind', 'fire', 'wave', 'book', 'noise'].forEach(type => {
+    const slider = document.getElementById(`vol-${type}`);
+    const valText = document.getElementById(`val-${type}`);
+    if (slider && valText) {
+      slider.oninput = () => {
+        valText.innerText = `${slider.value}%`;
+      };
+    }
+  });
+}
+
+function initIndexedDB() {
+  return new Promise((resolve) => {
+    if (!window.indexedDB) { resolve(null); return; }
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+    };
+    request.onsuccess = (e) => { dbInstance = e.target.result; resolve(dbInstance); };
+    request.onerror = () => resolve(null);
+  });
+}
+
+async function saveStateToStorage(stateData) {
+  const jsonString = JSON.stringify(stateData);
+  try { localStorage.setItem(STATE_KEY, jsonString); } catch(e){}
+  if (dbInstance) {
+    try {
+      const tx = dbInstance.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(jsonString, STATE_KEY);
+    } catch(e){}
+  }
+}
+
+async function loadStateFromStorage() {
+  let dataStr = null;
+  if (dbInstance) {
+    try {
+      dataStr = await new Promise((resolve) => {
+        const tx = dbInstance.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get(STATE_KEY);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(null);
+      });
+    } catch(e){}
+  }
+  if (!dataStr) {
+    try { dataStr = localStorage.getItem(STATE_KEY); } catch(e){}
+  }
+  return dataStr ? JSON.parse(dataStr) : null;
+}
+
+function selectBreed(breed) {
+  currentSelectedBreed = breed;
+  document.querySelectorAll('.breed-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`breed-${breed}`).classList.add('selected');
+}
+
+function confirmAdoption() {
+  const nameInput = document.getElementById('pet-name-input').value.trim();
+  state.name = nameInput || BREED_STYLES[currentSelectedBreed].name;
+  state.breed = currentSelectedBreed;
+  state.adopted = true;
+  state.adoptDate = getTodayString();
+  state.todayDate = state.adoptDate;
+  if (!state.checkInDates) state.checkInDates = [];
+  // 领养时初始食物：仅标准狗粮 10 个，其余 0 个
+  state.foodStock = { dogfood: 10, freeze_dried: 0, duck_meat: 0, canned: 0, snack: 0 };
+  
+  checkAndGrantBadge('first_meet');
+  saveData();
+  document.getElementById('adopt-view').classList.add('hidden');
+  showToast(`🎉 成功领养了小狗 [${state.name}]！已获赠 10 个标准狗粮`);
+  renderApp();
+}
+
+function confirmResetData() {
+  document.getElementById('confirm-reset-modal').classList.remove('hidden');
+}
+
+function executeResetData() {
+  closeModal('confirm-reset-modal');
+  state = {
+    ...DEFAULT_STATE,
+    foodStock: { dogfood: 10, freeze_dried: 0, duck_meat: 0, canned: 0, snack: 0 },
+    checkInDates: [],
+    inventory: ['ball', 'brush_default'],
+    placedDecorations: {},
+    unlockedBadges: {},
+    activeDates: [],
+    moodLogs: [],
+    pomoHistory: []
+  };
+  try { localStorage.removeItem(STATE_KEY); } catch(e){}
+  if (dbInstance) {
+    const tx = dbInstance.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).delete(STATE_KEY);
+  }
+  location.reload();
+}
+
+function getTodayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function getCompanionCheckInDays() {
+  if (!state.checkInDates) state.checkInDates = [];
+  if (state.lastCheckIn && !state.checkInDates.includes(state.lastCheckIn)) {
+    state.checkInDates.push(state.lastCheckIn);
+  }
+  return state.checkInDates.length;
+}
+
+function recordTodayActivity() {
+  const today = getTodayString();
+  if (!state.activeDates) state.activeDates = [];
+  if (!state.activeDates.includes(today)) {
+    state.activeDates.push(today);
+  }
+}
+
+// ✅ 每日跨天仅重置每日刷牙状态与每日打卡任务，食物库存永久保持不重置
+function checkDailyReset() {
+  const today = getTodayString();
+  if (state.todayDate !== today) {
+    state.todayDate = today;
+    state.hasFedToday = false;
+    state.canBrush = false;
+    state.tasks.forEach(t => t.done = false);
+    saveData();
+  }
+}
+
+function saveData() { saveStateToStorage(state); if (typeof NATIVE !== 'undefined' && NATIVE) scheduleNativeSync(); }
+
+window.addEventListener('DOMContentLoaded', async () => {
+  await initIndexedDB();
+  const loaded = await loadStateFromStorage();
+
+  if (loaded && loaded.adopted) {
+    state = { ...DEFAULT_STATE, ...loaded };
+    if (loaded.canBrush === undefined) state.canBrush = !!loaded.hasFedToday && loaded.lastBrushedDate !== getTodayString();
+    if (!Array.isArray(state.checkInDates)) state.checkInDates = [];
+    if (state.lastCheckIn && !state.checkInDates.includes(state.lastCheckIn)) {
+      state.checkInDates.push(state.lastCheckIn);
+    }
+    // 兼容旧存档结构，确保 foodStock 字段完整存在
+    if (!state.foodStock || typeof state.foodStock !== 'object') {
+      state.foodStock = {
+        dogfood: 10,
+        freeze_dried: 0,
+        duck_meat: 0,
+        canned: 0,
+        snack: 0
+      };
+    }
+    document.getElementById('adopt-view').classList.add('hidden');
+    checkDailyReset();
+    renderApp();
+    handleReturn();
+  } else {
+    document.getElementById('adopt-view').classList.remove('hidden');
+  }
+});
+
+function renderApp() {
+  const days = getCompanionCheckInDays();
+  const today = getTodayString();
+  const hasCheckedInToday = state.checkInDates.includes(today);
+
+  document.getElementById('status-days').innerText = `🐾 已陪伴 ${days} 天`;
+  document.getElementById('status-level').innerText = `Lv.${state.level} 亲密度`;
+  document.getElementById('status-coins').innerText = state.coins;
+  document.getElementById('shop-coin-balance').innerText = state.coins;
+  
+  const checkinBtn = document.getElementById('checkin-btn');
+  if (checkinBtn) {
+    checkinBtn.innerText = hasCheckedInToday ? '已签到 ✓' : '签到';
+    if (hasCheckedInToday) {
+      checkinBtn.style.background = '#d1fae5';
+      checkinBtn.style.color = '#065f46';
+      checkinBtn.style.boxShadow = 'none';
+    } else {
+      checkinBtn.style.background = '';
+      checkinBtn.style.color = '';
+      checkinBtn.style.boxShadow = '';
+    }
+  }
+  
+  const expPercent = Math.min(100, Math.floor((state.exp / state.maxExp) * 100));
+  document.getElementById('status-exp').style.width = `${expPercent}%`;
+
+  renderPuppySVG();
+  renderPlacedDecorations();
+  updateEquippedToyTag();
+
+  document.getElementById('stat-adopt-date').innerText = state.adoptDate || '--';
+  document.getElementById('stat-checkin-days').innerText = `${days} 天`;
+  document.getElementById('stat-feed-count').innerText = `${state.feedCount} 次`;
+  document.getElementById('stat-brush-count').innerText = `${state.brushDays} 天`;
+
+  renderTasks();
+  renderAlarms();
+  updateBrushButton();
+  refreshRandomQuote();
+  renderMoodAnalysis();
+  renderMoodHistory();
+  renderBadges();
+}
+
+function renderPuppySVG() {
+  const style = BREED_STYLES[state.breed] || BREED_STYLES.golden;
+  const svg = document.getElementById('puppy-svg');
+  
+  let glassesSvg = '';
+  if (state.outfitGlasses === 'sunglasses') {
+    glassesSvg = `<g fill="#1e293b"><ellipse cx="36" cy="43" rx="10" ry="7"/><ellipse cx="64" cy="43" rx="10" ry="7"/><line x1="46" y1="43" x2="54" y2="43" stroke="#1e293b" stroke-width="2.5"/></g>`;
+  } else if (state.outfitGlasses === 'reading') {
+    glassesSvg = `<g fill="none" stroke="#475569" stroke-width="2"><circle cx="36" cy="43" r="8"/><circle cx="64" cy="43" r="8"/><line x1="44" y1="43" x2="56" y2="43"/></g>`;
+  }
+
+  let clothesSvg = '';
+  let neckAccessorySvg = '';
+  if (state.outfitClothes === 'red_shirt') {
+    clothesSvg = `
+      <path d="M 24 68 Q 50 62 76 68 L 80 90 Q 50 96 20 90 Z" fill="#ef4444"/>
+      <path d="M 50 75 Q 45 79 42 83 L 50 88 L 58 83 Z" fill="#ffffff" opacity="0.85"/>
+    `;
+  } else if (state.outfitClothes === 'sailor') {
+    clothesSvg = `
+      <path d="M 24 68 Q 50 62 76 68 L 80 90 Q 50 96 20 90 Z" fill="#3b82f6"/>
+      <polygon points="32,68 50,82 68,68 50,74" fill="#ffffff"/>
+      <polygon points="47,76 53,76 50,86" fill="#ef4444"/>
+    `;
+  } else if (state.outfitClothes === 'duck_hoodie') {
+    clothesSvg = `
+      <path d="M 24 68 Q 50 62 76 68 L 80 90 Q 50 96 20 90 Z" fill="#facc15"/>
+      <circle cx="50" cy="80" r="6" fill="#fef08a"/>
+      <polygon points="46,80 54,80 50,84" fill="#f97316"/>
+    `;
+  } else if (state.outfitClothes === 'bowtie') {
+    neckAccessorySvg = `
+      <g transform="translate(0, 3)">
+        <polygon points="36,68 50,74 44,64" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <polygon points="64,68 50,74 56,64" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+        <polygon points="35,66 50,74 35,82" fill="#1e293b" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
+        <polygon points="65,66 50,74 65,82" fill="#1e293b" stroke="#0f172a" stroke-width="1.2" stroke-linejoin="round"/>
+        <rect x="46.5" y="70.5" width="7" height="7" rx="2" fill="#e11d48" stroke="#9f1239" stroke-width="1"/>
+      </g>
+    `;
+  }
+
+  const br = state.breed;
+  const sl = state.isSleeping;
+  const m = style.main, e = style.ear;
+
+  let ears;
+  if (br === 'corgi') {
+    ears = `
+      <g class="ear-l"><path d="M 20 34 L 27 4 L 47 20 Z" fill="${e}" stroke="${e}" stroke-width="4" stroke-linejoin="round"/><path d="M 27 28 L 30 13 L 40 21 Z" fill="#ffb3b8"/></g>
+      <g class="ear-r"><path d="M 80 34 L 73 4 L 53 20 Z" fill="${e}" stroke="${e}" stroke-width="4" stroke-linejoin="round"/><path d="M 73 28 L 70 13 L 60 21 Z" fill="#ffb3b8"/></g>`;
+  } else if (br === 'samoyed') {
+    ears = `
+      <g class="ear-l"><ellipse cx="25" cy="21" rx="10" ry="13" fill="${e}" transform="rotate(-18 25 21)"/><ellipse cx="26" cy="23" rx="5" ry="8" fill="#ffc9cf" transform="rotate(-18 26 23)"/></g>
+      <g class="ear-r"><ellipse cx="75" cy="21" rx="10" ry="13" fill="${e}" transform="rotate(18 75 21)"/><ellipse cx="74" cy="23" rx="5" ry="8" fill="#ffc9cf" transform="rotate(18 74 23)"/></g>`;
+  } else {
+    ears = `
+      <g class="ear-l"><ellipse cx="20" cy="42" rx="11" ry="22" fill="${e}" transform="rotate(18 20 42)"/><ellipse cx="21" cy="47" rx="5" ry="13" fill="#000" opacity=".09" transform="rotate(18 21 47)"/></g>
+      <g class="ear-r"><ellipse cx="80" cy="42" rx="11" ry="22" fill="${e}" transform="rotate(-18 80 42)"/><ellipse cx="79" cy="47" rx="5" ry="13" fill="#000" opacity=".09" transform="rotate(-18 79 47)"/></g>`;
+  }
+
+  const fluff = br === 'samoyed'
+    ? `<g fill="${m}"><circle cx="21" cy="50" r="8"/><circle cx="79" cy="50" r="8"/><circle cx="26" cy="68" r="7"/><circle cx="74" cy="68" r="7"/><circle cx="50" cy="15" r="7"/></g>` : '';
+  const blaze = br === 'corgi'
+    ? `<path d="M 50 17 Q 43 34 40 52 L 60 52 Q 57 34 50 17 Z" fill="#fffaf2"/>` : '';
+  const tail = `<path class="${sl ? '' : 'tail-wag'}" d="M 76 82 Q ${br === 'samoyed' ? '97 80 90 58' : '93 76 90 60'}" stroke="${m}" stroke-width="${br === 'samoyed' ? 13 : 9}" stroke-linecap="round" fill="none"/>`;
+
+  const eyes = sl
+    ? `<g fill="none" stroke="#2c221e" stroke-width="2.6" stroke-linecap="round"><path d="M 30 43 Q 36 48 42 43"/><path d="M 58 43 Q 64 48 70 43"/></g>`
+    : `<g class="eye-blink"><circle cx="36" cy="43" r="5.8" fill="#2c221e"/><circle cx="64" cy="43" r="5.8" fill="#2c221e"/><circle cx="38.4" cy="40.6" r="2.4" fill="#fff"/><circle cx="66.4" cy="40.6" r="2.4" fill="#fff"/><circle cx="34" cy="45.8" r="1.1" fill="#fff" opacity=".85"/><circle cx="62" cy="45.8" r="1.1" fill="#fff" opacity=".85"/></g>`;
+
+  const tongue = sl ? '' : `<g class="tongue"><path d="M 46.5 59.5 Q 50 73 53.5 59.5 Z" fill="#ff7e95"/><path d="M 50 61 L 50 67" stroke="#e85a78" stroke-width="1" stroke-linecap="round"/></g>`;
+  const zzz = sl ? `<text class="zzz" x="76" y="24" font-size="11" font-weight="800" fill="#7aa2d8">z</text><text class="zzz z2" x="84" y="14" font-size="8" font-weight="800" fill="#9bbbe6">z</text>` : '';
+
+  svg.innerHTML = `
+    ${tail}
+    ${ears}
+    <ellipse cx="50" cy="78" rx="28" ry="18" fill="${m}" />
+    <ellipse cx="50" cy="82" rx="13" ry="10" fill="#fffaf2" opacity="${br === 'samoyed' ? 0 : 0.95}" />
+    ${clothesSvg}
+    <g class="head-tilt">
+      ${fluff}
+      <circle cx="50" cy="46" r="32" fill="${m}" />
+      <ellipse cx="40" cy="26" rx="13" ry="6" fill="#ffffff" opacity=".2" transform="rotate(-18 40 26)" />
+      ${blaze}
+      <circle cx="36" cy="34" r="2.2" fill="${e}" opacity=".55"/>
+      <circle cx="64" cy="34" r="2.2" fill="${e}" opacity=".55"/>
+      <ellipse cx="50" cy="57" rx="16" ry="12" fill="#fffaf2" />
+      ${eyes}
+      <circle cx="26" cy="53" r="5.2" fill="#ff9aa8" opacity=".55" />
+      <circle cx="74" cy="53" r="5.2" fill="#ff9aa8" opacity=".55" />
+      ${tongue}
+      <path d="M 44.5 49.5 Q 50 45.5 55.5 49.5 Q 50 56 44.5 49.5 Z" fill="#2c221e" />
+      <ellipse cx="48" cy="48.6" rx="2.4" ry="1.2" fill="#ffffff" opacity=".6" />
+      <path d="M 50 54 L 50 57 M 50 57 Q 45 62 41 58 M 50 57 Q 55 62 59 58" stroke="#2c221e" stroke-width="2.2" stroke-linecap="round" fill="none" />
+      ${glassesSvg}
+    </g>
+    ${neckAccessorySvg}
+    <ellipse cx="38" cy="88" rx="8.5" ry="6" fill="#ffffff" stroke="${m}" stroke-width="2" />
+    <ellipse cx="62" cy="88" rx="8.5" ry="6" fill="#ffffff" stroke="${m}" stroke-width="2" />
+    <circle cx="35" cy="88" r="1.2" fill="#ffc2c9"/><circle cx="38" cy="90" r="1.2" fill="#ffc2c9"/><circle cx="41" cy="88" r="1.2" fill="#ffc2c9"/>
+    <circle cx="59" cy="88" r="1.2" fill="#ffc2c9"/><circle cx="62" cy="90" r="1.2" fill="#ffc2c9"/><circle cx="65" cy="88" r="1.2" fill="#ffc2c9"/>
+    ${zzz}
+  `;
+}
+
+function openDressUpModal(e) {
+  if (e) e.stopPropagation();
+  renderWardrobeItems();
+  document.getElementById('dressup-modal').classList.remove('hidden');
+}
+
+function renderWardrobeItems() {
+  const clothesGrid = document.getElementById('wardrobe-clothes-grid');
+  const glassesGrid = document.getElementById('wardrobe-glasses-grid');
+  clothesGrid.innerHTML = '';
+  glassesGrid.innerHTML = '';
+
+  const clothesOptions = [
+    { id: 'none', outfitVal: 'none', name: '原生态', iconHtml: '<span style="font-size:24px;">🚫</span>', owned: true },
+    ...ITEMS_DB.outfit.filter(i => i.outfitType === 'clothes').map(i => ({
+      ...i,
+      iconHtml: `<div style="width:28px; height:28px;">${SVG_MODEL_FACTORY[i.id]}</div>`,
+      owned: state.inventory.includes(i.id)
+    }))
+  ];
+
+  clothesOptions.forEach(item => {
+    const isActive = state.outfitClothes === item.outfitVal;
+    const div = document.createElement('div');
+    div.className = `dress-item ${isActive ? 'active' : ''} ${!item.owned ? 'locked' : ''}`;
+    div.innerHTML = `
+      ${item.iconHtml}
+      <span style="font-size:11px; font-weight:bold;">${item.name}</span>
+      ${!item.owned ? `<span class="dress-lock-badge">未购买</span>` : (isActive ? `<span style="font-size:9px; color:var(--primary); font-weight:bold;">穿戴中</span>` : '')}
+    `;
+    div.onclick = () => {
+      if (!item.owned) {
+        showToast("🛒 尚未拥有该衣服，请先去商城购买哦！");
+        return;
+      }
+      changeOutfit('clothes', item.outfitVal);
+    };
+    clothesGrid.appendChild(div);
+  });
+
+  const glassesOptions = [
+    { id: 'none', outfitVal: 'none', name: '无饰品', iconHtml: '<span style="font-size:24px;">🚫</span>', owned: true },
+    ...ITEMS_DB.outfit.filter(i => i.outfitType === 'glasses').map(i => ({
+      ...i,
+      iconHtml: `<div style="width:28px; height:28px;">${SVG_MODEL_FACTORY[i.id]}</div>`,
+      owned: state.inventory.includes(i.id)
+    }))
+  ];
+
+  glassesOptions.forEach(item => {
+    const isActive = state.outfitGlasses === item.outfitVal;
+    const div = document.createElement('div');
+    div.className = `dress-item ${isActive ? 'active' : ''} ${!item.owned ? 'locked' : ''}`;
+    div.innerHTML = `
+      ${item.iconHtml}
+      <span style="font-size:11px; font-weight:bold;">${item.name}</span>
+      ${!item.owned ? `<span class="dress-lock-badge">未购买</span>` : (isActive ? `<span style="font-size:9px; color:var(--primary); font-weight:bold;">穿戴中</span>` : '')}
+    `;
+    div.onclick = () => {
+      if (!item.owned) {
+        showToast("🛒 尚未拥有该配饰，请先去商城购买哦！");
+        return;
+      }
+      changeOutfit('glasses', item.outfitVal);
+    };
+    glassesGrid.appendChild(div);
+  });
+}
+
+function goToOutfitShop() {
+  closeModal('dressup-modal');
+  activeShopTab = 'outfit';
+  document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-shop').classList.remove('hidden');
+  document.querySelectorAll('.nav-item')[4].classList.add('active');
+  
+  document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.shop-tab')[0].classList.add('active');
+  renderShop();
+}
+
+function goToFoodShop() {
+  closeModal('feeding-modal');
+  activeShopTab = 'food';
+  document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-shop').classList.remove('hidden');
+  document.querySelectorAll('.nav-item')[4].classList.add('active');
+  
+  document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.shop-tab')[1].classList.add('active');
+  renderShop();
+}
+
+function changeOutfit(type, val) {
+  if (type === 'glasses') state.outfitGlasses = val;
+  if (type === 'clothes') state.outfitClothes = val;
+  saveData();
+  renderPuppySVG();
+  renderWardrobeItems();
+  showToast("✨ 造型更新啦！真好看！");
+}
+
+function updateEquippedToyTag() {
+  const toyObj = ITEMS_DB.toy.find(t => t.id === state.equippedToy) || ITEMS_DB.toy[0];
+  const tag = document.getElementById('equipped-toy-tag');
+  tag.innerHTML = `<span style="width:20px; height:20px; display:inline-block;">${SVG_MODEL_FACTORY[toyObj.id]}</span> 装备: ${toyObj.name} <span style="font-size:10px; opacity:0.7;">[切换 ▾]</span>`;
+}
+
+function openToySelectModal() {
+  const container = document.getElementById('toy-select-list');
+  container.innerHTML = '';
+  
+  ITEMS_DB.toy.forEach(toy => {
+    const owned = state.inventory.includes(toy.id);
+    const isCurrent = state.equippedToy === toy.id;
+    
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding:10px; border-radius:12px; border: 1.5px solid ${isCurrent ? 'var(--primary)' : 'var(--border-color)'}; background:${isCurrent ? 'var(--primary-light)' : (owned ? '#ffffff' : '#f9f9f9')}; opacity:${owned ? '1' : '0.5'}; cursor:${owned ? 'pointer' : 'default'};`;
+    
+    row.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:32px; height:32px;">${SVG_MODEL_FACTORY[toy.id] || ''}</div>
+        <div>
+          <div style="font-weight:bold; font-size:13px; color:${isCurrent ? 'var(--primary)' : 'var(--text-main)'};">${toy.name} ${isCurrent ? '✨ (使用中)' : ''}</div>
+          <div style="font-size:11px; color:#888;">${toy.desc}</div>
+        </div>
+      </div>
+      ${owned ? 
+        (isCurrent ? `<span style="font-size:11px; font-weight:bold; color:var(--primary);">已装备</span>` : `<button class="btn" style="padding:4px 10px; font-size:11px;" onclick="selectAndEquipToy('${toy.id}')">使用</button>`) : 
+        `<span style="font-size:11px; color:#aaa;">未解锁</span>`
+      }
+    `;
+
+    if (owned && !isCurrent) row.onclick = () => selectAndEquipToy(toy.id);
+    container.appendChild(row);
+  });
+  
+  document.getElementById('toy-select-modal').classList.remove('hidden');
+}
+
+function selectAndEquipToy(toyId) {
+  state.equippedToy = toyId;
+  saveData();
+  updateEquippedToyTag();
+  closeModal('toy-select-modal');
+  showToast(`🎾 已成功装备：${(ITEMS_DB.toy.find(t=>t.id===toyId)||{}).name || '玩具'}`);
+}
+
+function renderPlacedDecorations() {
+  const layer = document.getElementById('room-decorations-layer');
+  layer.innerHTML = '';
+  layer.style.pointerEvents = isDecorEditMode ? 'auto' : 'none';
+  
+  Object.keys(state.placedDecorations).forEach(itemId => {
+    const pos = state.placedDecorations[itemId];
+    const itemObj = ITEMS_DB.home.find(h => h.id === itemId);
+    if (!itemObj) return;
+
+    const decor = document.createElement('div');
+    decor.className = `draggable-decor ${isDecorEditMode ? 'editing' : ''}`;
+    decor.style.left = `${pos.x}px`;
+    decor.style.top = `${pos.y}px`;
+    decor.style.width = '60px';
+    decor.style.height = '60px';
+    decor.innerHTML = SVG_MODEL_FACTORY[itemId] || '';
+
+    if (isDecorEditMode) enableDrag(decor, itemId);
+    layer.appendChild(decor);
+  });
+}
+
+function toggleDecorEditMode() {
+  isDecorEditMode = !isDecorEditMode;
+  const btn = document.getElementById('toggle-decor-edit-btn');
+  if (isDecorEditMode) {
+    btn.innerText = "🔒 锁定保存位置";
+    btn.style.background = "var(--primary)";
+    btn.style.color = "white";
+    showToast("🛠️ 已开启布置模式：拖拽移动物品");
+  } else {
+    btn.innerText = "🛠️ 开启布置模式";
+    btn.style.background = "#f0e6dd";
+    btn.style.color = "var(--text-main)";
+    showToast("✨ 房间布置成功！");
+    saveData();
+  }
+  renderPlacedDecorations();
+}
+
+function enableDrag(el, itemId) {
+  let startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
+
+  const onStart = (e) => {
+    e.stopPropagation();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    startX = clientX;
+    startY = clientY;
+    initialLeft = parseInt(el.style.left) || 0;
+    initialTop = parseInt(el.style.top) || 0;
+
+    const onMove = (me) => {
+      const curX = me.touches ? me.touches[0].clientX : me.clientX;
+      const curY = me.touches ? me.touches[0].clientY : me.clientY;
+      const deltaX = curX - startX;
+      const deltaY = curY - startY;
+      
+      const newX = Math.max(0, Math.min(320, initialLeft + deltaX));
+      const newY = Math.max(0, Math.min(260, initialTop + deltaY));
+      
+      el.style.left = `${newX}px`;
+      el.style.top = `${newY}px`;
+      state.placedDecorations[itemId] = { x: newX, y: newY };
+    };
+
+    const onEnd = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onEnd);
+    };
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onEnd);
+    document.addEventListener('touchmove', onMove);
+    document.addEventListener('touchend', onEnd);
+  };
+
+  el.onmousedown = onStart;
+  el.ontouchstart = onStart;
+}
+
+function showToast(msg) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerText = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function addExp(amount) {
+  state.exp += amount;
+  showToast(`✨ 亲密度 +${amount}`);
+  if (state.exp >= state.maxExp) {
+    state.level += 1;
+    state.exp -= state.maxExp;
+    state.maxExp = Math.floor(state.maxExp * 1.5);
+    state.coins += 50;
+    showToast(`🎉 亲密度升级到 Lv.${state.level}！奖励 50 🪙`);
+  }
+  recordTodayActivity();
+  evaluateAllBadges();
+  saveData();
+  renderApp();
+}
+
+function spawnHeart() {
+  const c = document.getElementById('puppy-container');
+  const stage = document.querySelector('.pet-stage');
+  if (!c || !stage) return;
+  for (let i = 0; i < 3; i++) {
+    const h = document.createElement('div');
+    h.className = 'pop-heart';
+    h.textContent = ['💛', '🧡', '💕'][Math.floor(Math.random() * 3)];
+    h.style.left = (c.offsetLeft + 30 + Math.random() * 70) + 'px';
+    h.style.top = (c.offsetTop + 10) + 'px';
+    h.style.animationDelay = (i * 0.12) + 's';
+    stage.appendChild(h);
+    setTimeout(() => h.remove(), 1300);
+  }
+}
+
+function petPuppy(e) {
+  if (isFetchMode) return;
+  if (e) e.stopPropagation();
+  if (state.isSleeping) {
+    showToast("💤 狗狗正在睡觉，别打扰它哦...");
+    return;
+  }
+  const quotes = ["汪汪！主子摸得我好舒服~", "摇尾巴~ 最喜欢主子了！", "蹭蹭你的手 🐾"];
+  document.getElementById('pet-bubble').innerText = quotes[Math.floor(Math.random() * quotes.length)];
+  spawnHeart();
+  addExp(5);
+}
+
+function dailyCheckIn() {
+  const today = getTodayString();
+  if (!state.checkInDates) state.checkInDates = [];
+
+  if (state.checkInDates.includes(today)) {
+    showToast("今天已经签过到啦，明天再来吧！");
+    return;
+  }
+  state.lastCheckIn = today;
+  state.checkInDates.push(today);
+  state.coins += 30;
+  recordTodayActivity();
+  evaluateAllBadges();
+  showToast(`📅 签到成功！陪伴天数 +1 (累计 ${state.checkInDates.length} 天)，获得 30 🪙`);
+  addExp(10);
+}
+
+function toggleSleep() {
+  state.isSleeping = !state.isSleeping;
+  renderPuppySVG();
+  const bubble = document.getElementById('pet-bubble');
+  const btnLabel = document.getElementById('sleep-btn-label');
+  const room = document.getElementById('pet-room');
+  
+  if (state.isSleeping) {
+    room.classList.add('night-mode');
+    bubble.innerText = "💤 呼噜噜... 晚安💤...";
+    btnLabel.innerText = "醒来";
+    showToast("😴 狗狗关灯睡觉啦");
+  } else {
+    room.classList.remove('night-mode');
+    bubble.innerText = "汪！伸个懒腰，醒啦！";
+    btnLabel.innerText = "睡觉";
+    showToast("☀️ 狗狗醒过来啦！");
+  }
+  saveData();
+}
+
+function toggleFetchMode() {
+  isFetchMode = !isFetchMode;
+  const btnLabel = document.getElementById('fetch-btn-label');
+  const pup = document.getElementById('puppy-container');
+  
+  if (isFetchMode) {
+    btnLabel.innerText = "退出抛球";
+    if (pup) pup.style.pointerEvents = "none";
+    document.getElementById('pet-bubble').innerText = "点击房间任意位置抛出玩具，我会捡回来哦！";
+    showToast("🎾 进入抛球模式，轻触房间抛球");
+  } else {
+    btnLabel.innerText = "抛球模式";
+    if (pup) pup.style.pointerEvents = "auto";
+    document.getElementById('pet-bubble').innerText = "汪！主子你准备和我玩什么呢？";
+  }
+}
+
+let lastFetchTouchTime = 0;
+
+function handleFetchTouch(e) {
+  if (!isFetchMode || state.isSleeping || isDogMoving || isDecorEditMode) return;
+  if (e.target && e.target.closest('.dress-up-btn, .chat-open-btn')) return;
+  
+  e.preventDefault();
+  lastFetchTouchTime = Date.now();
+  
+  if (e.changedTouches && e.changedTouches.length > 0) {
+    const touch = e.changedTouches[0];
+    triggerFetchAt(touch.clientX, touch.clientY);
+  }
+}
+
+function handleFetchClick(e) {
+  if (Date.now() - lastFetchTouchTime < 500) return;
+  if (!isFetchMode || state.isSleeping || isDogMoving || isDecorEditMode) return;
+  if (e.target && e.target.closest('.dress-up-btn, .chat-open-btn')) return;
+  
+  triggerFetchAt(e.clientX, e.clientY);
+}
+
+function triggerFetchAt(clientX, clientY) {
+  const room = document.getElementById('pet-room');
+  const rect = room.getBoundingClientRect();
+
+  const targetX = Math.max(30, Math.min(rect.width - 30, clientX - rect.left));
+  const targetY = Math.max(60, Math.min(rect.height - 30, clientY - rect.top));
+
+  const toyObj = ITEMS_DB.toy.find(t => t.id === state.equippedToy) || ITEMS_DB.toy[0];
+
+  isDogMoving = true;
+  const dropped = document.createElement('div');
+  dropped.className = 'dropped-item';
+  dropped.style.width = '32px';
+  dropped.style.height = '32px';
+  dropped.style.left = `${targetX}px`;
+  dropped.style.top = `${targetY}px`;
+  dropped.innerHTML = SVG_MODEL_FACTORY[toyObj.id] || '';
+  room.appendChild(dropped);
+
+  const pup = document.getElementById('puppy-container');
+  const mouthBall = document.getElementById('mouth-ball');
+
+  setTimeout(() => {
+    pup.style.left = `${targetX - 65}px`;
+    pup.style.top = `${targetY - 65}px`;
+  }, 150);
+
+  setTimeout(() => {
+    dropped.remove();
+    mouthBall.style.display = 'block';
+    mouthBall.innerHTML = SVG_MODEL_FACTORY[toyObj.id] || '';
+    mouthBall.style.left = `${targetX - 15}px`;
+    mouthBall.style.top = `${targetY - 25}px`;
+    document.getElementById('pet-bubble').innerText = `汪！叼住了 ${toyObj.name}！`;
+  }, 650);
+
+  setTimeout(() => {
+    pup.style.left = 'calc(50% - 65px)';
+    pup.style.top = 'calc(62% - 65px)';
+    mouthBall.style.left = 'calc(50% - 15px)';
+    mouthBall.style.top = 'calc(62% - 25px)';
+  }, 1150);
+
+  setTimeout(() => {
+    mouthBall.style.display = 'none';
+    isDogMoving = false;
+    state.playCount++;
+    recordTodayActivity();
+    evaluateAllBadges();
+    document.getElementById('pet-bubble').innerText = `把 ${toyObj.name} 交给主子啦！`;
+    addExp(8);
+  }, 1650);
+}
+
+// 🍖 喂食系统：展示每种食物真实永久库存，库存为 0 不可喂食
+function openFeedingModal() {
+  if (state.isSleeping) { showToast("💤 狗狗在睡觉呢"); return; }
+  const list = document.getElementById('feeding-list');
+  list.innerHTML = '';
+  
+  ITEMS_DB.food.forEach(item => {
+    const remaining = state.foodStock[item.id] ?? 0;
+    const isEmpty = remaining <= 0;
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:${isEmpty ? '#f5f5f5' : '#fdf5ef'}; border-radius:14px; border: 1px solid ${isEmpty ? '#eee' : 'var(--border-color)'};`;
+    row.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; opacity:${isEmpty ? '0.6' : '1'};">
+        <div style="width:36px; height:36px;">${SVG_MODEL_FACTORY[item.id] || ''}</div>
+        <div>
+          <div style="font-weight:bold; font-size:13px; display:flex; align-items:center; gap:6px;">
+            ${item.name}
+            <span style="font-size:11px; padding:1px 7px; border-radius:10px; background:${isEmpty ? '#fee2e2' : '#ffedd5'}; color:${isEmpty ? '#dc2626' : '#c2410c'};">
+              剩余: ${remaining}
+            </span>
+          </div>
+          <div style="font-size:11px; color:#888; margin-top:2px;">亲密度 +${item.exp} | 情绪 +${item.mood}</div>
+        </div>
+      </div>
+      <button class="btn" style="padding:6px 14px; font-size:12px;" ${isEmpty ? 'disabled' : ''} onclick="feedPet('${item.id}')">
+        ${isEmpty ? '已用完' : `喂食 (${remaining})`}
+      </button>
+    `;
+    list.appendChild(row);
+  });
+  document.getElementById('feeding-modal').classList.remove('hidden');
+}
+
+function feedPet(foodId) {
+  const item = ITEMS_DB.food.find(f => f.id === foodId);
+  const currentStock = state.foodStock[foodId] ?? 0;
+  if (currentStock <= 0) {
+    showToast(`🦴 [${item.name}] 库存已用完，快去商城购买吧！`);
+    return;
+  }
+  state.foodStock[foodId] = currentStock - 1;
+  state.feedCount++;
+  state.hasFedToday = true;
+  state.canBrush = true;
+  recordTodayActivity();
+  evaluateAllBadges();
+  closeModal('feeding-modal');
+  document.getElementById('pet-bubble').innerText = `吧唧吧唧... 享用了 ${item.name}！(剩余 ${state.foodStock[foodId]} 个)`;
+  addExp(item.exp);
+}
+
+function updateBrushButton() {
+  const b = document.getElementById('brush-action-btn'), l = document.getElementById('brush-btn-label');
+  if (!b || !l) return;
+  b.classList.toggle('is-locked', !state.canBrush);
+  l.innerText = state.canBrush ? '刷牙' : '先喂食再刷';
+}
+
+function openBrushModal() {
+  if (state.isSleeping) { showToast("💤 狗狗在睡觉呢"); return; }
+  if (!state.canBrush) {
+    showToast("🦴 先喂食才能刷牙哦！每次刷完牙都要再喂一次～");
+    return;
+  }
+
+  const container = document.getElementById('dirt-spots-container');
+  container.innerHTML = '';
+  
+  const toothPositions = [
+    { left: '104px', top: '188px' },
+    { left: '132px', top: '175px' },
+    { left: '158px', top: '174px' },
+    { left: '184px', top: '174px' },
+    { left: '210px', top: '175px' },
+    { left: '238px', top: '188px' },
+    { left: '116px', top: '216px' },
+    { left: '168px', top: '224px' },
+    { left: '226px', top: '216px' }
+  ];
+  remainingDirt = toothPositions.length;
+
+  toothPositions.forEach((pos) => {
+    const spot = document.createElement('div');
+    spot.className = 'dirt-spot';
+    spot.style.left = pos.left;
+    spot.style.top = pos.top;
+    spot.onmouseover = () => cleanSpot(spot);
+    spot.ontouchstart = () => cleanSpot(spot);
+    container.appendChild(spot);
+  });
+
+  const brushCursor = document.getElementById('brush-cursor');
+  brushCursor.innerHTML = SVG_MODEL_FACTORY[state.equippedBrush] || SVG_MODEL_FACTORY.brush_default;
+  if (state.equippedBrush === 'brush_gold') {
+    brushCursor.classList.add('gold-brush-active');
+  } else {
+    brushCursor.classList.remove('gold-brush-active');
+  }
+
+  document.getElementById('brush-modal').classList.remove('hidden');
+}
+
+function handleBrushMove(e) {
+  const stage = document.getElementById('brush-stage');
+  const rect = stage.getBoundingClientRect();
+  const cursor = document.getElementById('brush-cursor');
+  cursor.style.left = `${e.clientX - rect.left - 20}px`;
+  cursor.style.top = `${e.clientY - rect.top - 20}px`;
+}
+
+function handleBrushMoveTouch(e) {
+  if (!e.touches[0]) return;
+  const stage = document.getElementById('brush-stage');
+  const rect = stage.getBoundingClientRect();
+  const cursor = document.getElementById('brush-cursor');
+  cursor.style.left = `${e.touches[0].clientX - rect.left - 20}px`;
+  cursor.style.top = `${e.touches[0].clientY - rect.top - 20}px`;
+  
+  const touch = e.touches[0];
+  const target = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (target && target.classList.contains('dirt-spot')) {
+    cleanSpot(target);
+  }
+}
+
+function cleanSpot(spotEl) {
+  if (spotEl.style.opacity === '0') return;
+  spotEl.style.opacity = '0';
+  spotEl.style.transform = 'scale(0)';
+  remainingDirt--;
+
+  if (remainingDirt <= 0) {
+    setTimeout(() => {
+      closeModal('brush-modal');
+      const today = getTodayString();
+      if (state.lastBrushedDate !== today) state.brushDays++;
+      state.lastBrushedDate = today;
+      state.canBrush = false;
+      recordTodayActivity();
+      evaluateAllBadges();
+      showToast("✨ 洁牙完成！下次刷牙前要先喂食哦～");
+      addExp(20);
+    }, 300);
+  }
+}
+
+function refreshRandomQuote() {
+  if (!state.quotesReadHistory) state.quotesReadHistory = [];
+  let unread = BUILTIN_QUOTES.filter(q => !state.quotesReadHistory.includes(q));
+  if (unread.length === 0) {
+    state.quotesReadHistory = [];
+    unread = [...BUILTIN_QUOTES];
+  }
+  const quote = unread[Math.floor(Math.random() * unread.length)];
+  state.quotesReadHistory.push(quote);
+  document.getElementById('quote-display-box').innerText = quote;
+  saveData();
+}
+
+function selectMoodChip(key, emoji, label, e) {
+  selectedMoodKey = key;
+  document.querySelectorAll('.mood-chip').forEach(c => c.classList.remove('selected'));
+  if (e) e.currentTarget.classList.add('selected');
+}
+
+function saveMoodLog() {
+  const text = document.getElementById('mood-note-input').value.trim();
+  if (!text) { showToast("写点什么记录一下吧"); return; }
+  const moodObj = MOOD_TYPES[selectedMoodKey];
+  state.moodLogs.unshift({ date: getTodayString(), key: selectedMoodKey, emoji: moodObj.emoji, label: moodObj.label, text });
+  document.getElementById('mood-note-input').value = '';
+  recordTodayActivity();
+  evaluateAllBadges();
+  showToast("📝 心情日记已保存");
+  saveData();
+  renderMoodAnalysis();
+  renderMoodHistory();
+}
+
+function renderMoodAnalysis() {
+  const box = document.getElementById('mood-analysis-box');
+  const now = new Date();
+  const logsInRange = state.moodLogs.filter(log => {
+    const logDate = new Date(log.date);
+    const diffDays = (now - logDate) / (1000 * 60 * 60 * 24);
+    return diffDays <= currentAnalysisRange;
+  });
+
+  if (logsInRange.length === 0) {
+    box.innerHTML = `<div style="text-align:center; color:#aaa;">最近 ${currentAnalysisRange} 天暂无心情日记，快去写一篇吧！</div>`;
+    return;
+  }
+
+  const counts = {};
+  let totalScore = 0;
+  logsInRange.forEach(l => {
+    counts[l.label] = (counts[l.label] || 0) + 1;
+    totalScore += (MOOD_TYPES[l.key] ? MOOD_TYPES[l.key].score : 0);
+  });
+
+  let topMood = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+  let summary = totalScore > 2 ? "整体状态阳光积极☀️" : (totalScore < -2 ? "情绪稍显低落🌧️" : "心态稳健安康🌱");
+  let advice = totalScore < 0 ? "建议今晚早点休息，摸摸小狗缓解压力哦！" : "保持这份好心情，继续积极面对生活！";
+
+  box.innerHTML = `
+    <div><b>📅 近 ${currentAnalysisRange} 天日记统计：</b> 共 ${logsInRange.length} 篇</div>
+    <div><b>最频繁心情：</b> ${topMood} (${counts[topMood]}次) | <b>综合评估：</b> ${summary}</div>
+    <div style="margin-top:4px; color:var(--primary); font-weight:bold;">💡 小狗贴士：${advice}</div>
+  `;
+}
+
+function setMoodAnalysisRange(days) {
+  currentAnalysisRange = days;
+  document.getElementById('mood-range-7').style.background = days === 7 ? "var(--primary-light)" : "#f0e6dd";
+  document.getElementById('mood-range-7').style.color = days === 7 ? "var(--primary)" : "var(--text-main)";
+  document.getElementById('mood-range-30').style.background = days === 30 ? "var(--primary-light)" : "#f0e6dd";
+  document.getElementById('mood-range-30').style.color = days === 30 ? "var(--primary)" : "var(--text-main)";
+  renderMoodAnalysis();
+}
+
+function renderMoodHistory() {
+  const container = document.getElementById('mood-history-list');
+  container.innerHTML = '';
+  if (state.moodLogs.length === 0) {
+    container.innerHTML = '<div style="font-size:12px; color:#aaa; text-align:center;">暂无心情记录</div>';
+    return;
+  }
+  state.moodLogs.slice(0, 5).forEach(log => {
+    const item = document.createElement('div');
+    item.style.cssText = 'background:#fdf5ef; padding:10px; border-radius:12px; font-size:12px; display:flex; justify-content:space-between; align-items:center;';
+    item.innerHTML = `
+      <div><b>${log.emoji} [${log.label}]</b> ${log.text}</div>
+      <div style="color:#aaa; font-size:10px;">${log.date}</div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+function setPomoPreset(mins) {
+  if (isPomoRunning) {
+    showToast("⚠️ 计时中无法切换预设，请先暂停或重置");
+    return;
+  }
+  pomoTotalDuration = mins * 60;
+  pomoSecondsLeft = pomoTotalDuration;
+  updatePomoDisplay();
+}
+
+function updatePomoDisplay() {
+  const m = Math.floor(pomoSecondsLeft / 60).toString().padStart(2, '0');
+  const s = (pomoSecondsLeft % 60).toString().padStart(2, '0');
+  document.getElementById('pomo-timer-text').innerText = `${m}:${s}`;
+  const coins = Math.floor(pomoTotalDuration / 300);
+  document.getElementById('pomo-reward-hint').innerText = `预计获得 ${coins} 🪙`;
+}
+
+function startPomoTimer() {
+  if (isPomoRunning) return;
+  updateAudioVolumeSliders();
+  const modal = document.getElementById('pomo-audio-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+}
+
+function confirmAndStartPomoWithAudio() {
+  closeModal('pomo-audio-modal');
+  initAudioContext();
+  
+  if (pomoTimerInterval) {
+    clearInterval(pomoTimerInterval);
+    pomoTimerInterval = null;
+  }
+  stopAmbientAudio();
+
+  const volRain = parseInt(document.getElementById('vol-rain').value) / 100;
+  const volWind = parseInt(document.getElementById('vol-wind').value) / 100;
+  const volFire = parseInt(document.getElementById('vol-fire').value) / 100;
+  const volWave = parseInt(document.getElementById('vol-wave').value) / 100;
+  const volBook = parseInt(document.getElementById('vol-book').value) / 100;
+  const volNoise = parseInt(document.getElementById('vol-noise').value) / 100;
+
+  soundNodes.rain = startRainAudio(volRain);
+  soundNodes.wind = startWindAudio(volWind);
+  soundNodes.fire = startFireAudio(volFire);
+  soundNodes.wave = startWaveAudio(volWave);
+  soundNodes.book = startBookAudio(volBook);
+  soundNodes.noise = startWhiteNoiseAudio(volNoise);
+
+  isPomoRunning = true;
+  document.getElementById('pomo-start-btn').disabled = true;
+  document.getElementById('pomo-pause-btn').disabled = false;
+
+  showToast("⏱️ 专注开始，环境音效已同步开启！");
+
+  pomoTimerInterval = setInterval(() => {
+    if (pomoSecondsLeft > 0) {
+      pomoSecondsLeft--;
+      updatePomoDisplay();
+    }
+    
+    if (pomoSecondsLeft <= 0) {
+      clearInterval(pomoTimerInterval);
+      pomoTimerInterval = null;
+      stopAmbientAudio();
+      isPomoRunning = false;
+      document.getElementById('pomo-start-btn').disabled = false;
+      document.getElementById('pomo-pause-btn').disabled = true;
+
+      const earnedCoins = Math.floor(pomoTotalDuration / 300);
+      state.coins += earnedCoins;
+      const taskName = document.getElementById('pomo-task-name').value.trim() || '专注学习';
+      state.pomoHistory.unshift({ date: getTodayString(), name: taskName, mins: Math.floor(pomoTotalDuration / 60), coins: earnedCoins });
+      recordTodayActivity();
+      evaluateAllBadges();
+      saveData();
+      renderApp();
+      showToast(`🎉 专注完成！已发放 ${earnedCoins} 🪙 狗狗币！`);
+      
+      pomoSecondsLeft = pomoTotalDuration;
+      updatePomoDisplay();
+    }
+  }, 1000);
+}
+
+function pausePomoTimer() {
+  if (pomoTimerInterval) {
+    clearInterval(pomoTimerInterval);
+    pomoTimerInterval = null;
+  }
+  stopAmbientAudio();
+  isPomoRunning = false;
+  document.getElementById('pomo-start-btn').disabled = false;
+  document.getElementById('pomo-pause-btn').disabled = true;
+  showToast("⏸️ 番茄钟及背景音已暂停");
+}
+
+function resetPomoTimer() {
+  pausePomoTimer();
+  pomoSecondsLeft = pomoTotalDuration;
+  updatePomoDisplay();
+  showToast("🔄 番茄钟已重置");
+}
+
+function openCustomPomoModal() {
+  if (isPomoRunning) {
+    showToast("⚠️ 计时中无法修改时长，请先暂停或重置");
+    return;
+  }
+  document.getElementById('custom-pomo-modal').classList.remove('hidden');
+}
+
+function confirmCustomPomo() {
+  const val = parseInt(document.getElementById('custom-pomo-input').value);
+  if (val && val >= 1 && val <= 180) {
+    setPomoPreset(val);
+    closeModal('custom-pomo-modal');
+  } else { showToast("请输入有效的分钟数 (1-180)"); }
+}
+
+function openPomoHistoryModal() {
+  const list = document.getElementById('pomo-history-list');
+  list.innerHTML = '';
+  if (!state.pomoHistory || state.pomoHistory.length === 0) {
+    list.innerHTML = '<div style="font-size:12px; color:#aaa; text-align:center;">暂无专注记录</div>';
+  } else {
+    state.pomoHistory.forEach(p => {
+      const row = document.createElement('div');
+      row.style.cssText = 'background:#fdf5ef; padding:8px 12px; border-radius:10px; font-size:12px; display:flex; justify-content:space-between;';
+      row.innerHTML = `<div><b>${p.name}</b> (${p.mins}分钟)</div><div style="color:#d97706;">+${p.coins} 🪙 (${p.date})</div>`;
+      list.appendChild(row);
+    });
+  }
+  document.getElementById('pomo-history-modal').classList.remove('hidden');
+}
+
+function clearPomoHistory() {
+  state.pomoHistory = [];
+  saveData();
+  openPomoHistoryModal();
+}
+
+function switchNav(viewName, e) {
+  document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`view-${viewName}`).classList.remove('hidden');
+  if (e) e.currentTarget.classList.add('active');
+  if (viewName === 'shop') renderShop();
+}
+
+function switchShopTab(tab, e) {
+  activeShopTab = tab;
+  document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+  if (e) e.currentTarget.classList.add('active');
+  renderShop();
+}
+
+function renderShop() {
+  const grid = document.getElementById('shop-grid-container');
+  grid.innerHTML = '';
+  const items = ITEMS_DB[activeShopTab] || [];
+  
+  items.forEach(item => {
+    // 食物支持重复购买累加库存（每份+10），非食物为单次解锁
+    if (activeShopTab === 'food') {
+      const stockCount = state.foodStock[item.id] ?? 0;
+      const card = document.createElement('div');
+      card.className = 'shop-item';
+      card.innerHTML = `
+        <div style="width:48px; height:48px;">${SVG_MODEL_FACTORY[item.id] || ''}</div>
+        <div style="font-weight:bold; font-size:13px;">${item.name}</div>
+        <div style="font-size:11px; color:var(--primary); font-weight:bold;">当前库存: ${stockCount} 个</div>
+        <div style="font-size:10px; color:#888;">${item.desc}</div>
+        <button class="btn" style="font-size:11px; padding:5px 12px; margin-top:2px;" onclick="buyFoodPack('${item.id}', ${item.price})">🪙 ${item.price} 买10个</button>
+      `;
+      grid.appendChild(card);
+      return;
+    }
+
+    const owned = state.inventory.includes(item.id);
+    const isEquippedToy = (activeShopTab === 'toy' && state.equippedToy === item.id);
+    const isEquippedBrush = (activeShopTab === 'brush' && state.equippedBrush === item.id);
+    const isEquippedOutfit = (activeShopTab === 'outfit' && (
+      (item.outfitType === 'clothes' && state.outfitClothes === item.outfitVal) ||
+      (item.outfitType === 'glasses' && state.outfitGlasses === item.outfitVal)
+    ));
+    
+    const card = document.createElement('div');
+    card.className = 'shop-item';
+    card.innerHTML = `
+      <div style="width:48px; height:48px;">${SVG_MODEL_FACTORY[item.id] || ''}</div>
+      <div style="font-weight:bold; font-size:13px;">${item.name}</div>
+      <div style="font-size:11px; color:#888;">${item.desc}</div>
+      ${owned ? 
+        (isEquippedToy || isEquippedBrush || isEquippedOutfit ? 
+          `<button class="btn btn-secondary" style="font-size:11px; padding:4px 10px;" disabled>穿戴中</button>` :
+          `<button class="btn" style="font-size:11px; padding:4px 10px;" onclick="equipItem('${item.id}', '${activeShopTab}')">${activeShopTab === 'outfit' ? '立即穿戴' : '装备使用'}</button>`
+        ) :
+        `<button class="btn" style="font-size:11px; padding:4px 10px;" onclick="buyItem('${item.id}', ${item.price})">🪙 ${item.price} 购买</button>`
+      }
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// 🛒 购买食物包：每买一份对应食物库存 +10 个
+function buyFoodPack(foodId, price) {
+  if (state.coins < price) {
+    showToast("🪙 狗狗币不足，快去打卡或专注赚取金币吧！");
+    return;
+  }
+  const foodObj = ITEMS_DB.food.find(f => f.id === foodId);
+  const addAmount = foodObj?.packSize || 10;
+  state.coins -= price;
+  state.foodStock[foodId] = (state.foodStock[foodId] ?? 0) + addAmount;
+  
+  showToast(`🍖 购买成功！[${foodObj.name}] 库存 +${addAmount} (现有 ${state.foodStock[foodId]} 个)`);
+  saveData();
+  renderApp();
+  renderShop();
+}
+
+function equipItem(itemId, category) {
+  if (category === 'toy') state.equippedToy = itemId;
+  if (category === 'brush') state.equippedBrush = itemId;
+  if (category === 'outfit') {
+    const outfitObj = ITEMS_DB.outfit.find(o => o.id === itemId);
+    if (outfitObj) {
+      if (outfitObj.outfitType === 'clothes') state.outfitClothes = outfitObj.outfitVal;
+      if (outfitObj.outfitType === 'glasses') state.outfitGlasses = outfitObj.outfitVal;
+    }
+  }
+  saveData();
+  renderApp();
+  renderShop();
+  showToast(category === 'outfit' ? "👗 已穿上新装扮！" : "✨ 已成功装备物品！");
+}
+
+function buyItem(itemId, price) {
+  if (state.coins < price) { showToast("🪙 金币不足哦"); return; }
+  state.coins -= price;
+  state.inventory.push(itemId);
+  
+  if (ITEMS_DB.home.some(h => h.id === itemId)) {
+    const decorObj = ITEMS_DB.home.find(h => h.id === itemId);
+    state.placedDecorations[itemId] = { x: decorObj.defaultX, y: decorObj.defaultY };
+  }
+
+  if (ITEMS_DB.outfit.some(o => o.id === itemId)) {
+    showToast("🛍️ 购买成功！已放入衣柜，可随时去穿戴~");
+  } else {
+    showToast("🛒 购买成功！");
+  }
+  
+  saveData();
+  renderApp();
+  renderShop();
+}
+
+function evaluateAllBadges() {
+  if (!state.adopted) return;
+  const companionDays = getCompanionCheckInDays();
+
+  if (state.brushDays >= 7) checkAndGrantBadge('brush_7');
+  if (state.brushDays >= 30) checkAndGrantBadge('brush_30');
+  if (state.brushDays >= 100) checkAndGrantBadge('brush_100');
+
+  if (companionDays >= 7) checkAndGrantBadge('companion_7');
+  if (companionDays >= 30) checkAndGrantBadge('companion_30');
+  if (companionDays >= 90) checkAndGrantBadge('companion_90');
+
+  if (state.feedCount >= 50) checkAndGrantBadge('feed_50');
+  if (state.playCount >= 50) checkAndGrantBadge('fetch_50');
+}
+
+function checkAndGrantBadge(badgeId) {
+  if (!state.unlockedBadges) state.unlockedBadges = {};
+  
+  if (!state.unlockedBadges[badgeId]) {
+    state.unlockedBadges[badgeId] = getTodayString();
+    saveData();
+
+    let foundBadge = null;
+    Object.keys(BADGES_DATABASE).forEach(cat => {
+      const item = BADGES_DATABASE[cat].find(b => b.id === badgeId);
+      if (item) foundBadge = item;
+    });
+
+    if (foundBadge) {
+      badgeToastQueue.push(foundBadge);
+      processNextBadgeToast();
+    }
+  }
+}
+
+function processNextBadgeToast() {
+  if (isShowingBadgeToast || badgeToastQueue.length === 0) return;
+
+  isShowingBadgeToast = true;
+  const badge = badgeToastQueue.shift();
+
+  if (navigator.vibrate) {
+    try { navigator.vibrate([40, 60, 40]); } catch(e){}
+  }
+
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = 'badge-unlock-toast';
+  toast.innerHTML = `
+    <span style="font-size: 26px;">${badge.icon}</span>
+    <div>
+      <div style="font-size: 14px; font-weight: bold; color: var(--text-main);">${badge.name}</div>
+      <div style="font-size: 11px; color: #d97706;">🎉 恭喜获得勋章！✨</div>
+    </div>
+  `;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+    setTimeout(() => {
+      isShowingBadgeToast = false;
+      processNextBadgeToast();
+    }, 500);
+  }, 1500);
+}
+
+function renderBadges() {
+  ['health', 'companion', 'interaction'].forEach(cat => {
+    const container = document.getElementById(`badge-list-${cat}`);
+    container.innerHTML = '';
+    BADGES_DATABASE[cat].forEach(b => {
+      const unlockedDate = state.unlockedBadges ? state.unlockedBadges[b.id] : null;
+      const isUnlocked = !!unlockedDate;
+      
+      const card = document.createElement('div');
+      card.className = `badge-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+      card.onclick = () => openBadgeDetailModal(b, isUnlocked, unlockedDate);
+      card.innerHTML = `
+        <div style="font-size:26px;">${b.icon}</div>
+        <div style="font-size:11px; font-weight:bold; text-align:center;">${b.name}</div>
+        <div class="badge-status-tag">${isUnlocked ? '已获得' : '未解锁'}</div>
+      `;
+      container.appendChild(card);
+    });
+  });
+}
+
+function getBadgeProgressText(badge) {
+  if (badge.id === 'first_meet') return state.adopted ? '目标进度: 1/1 (已领养)' : '目标进度: 0/1 (未领养)';
+  if (badge.id.startsWith('brush_')) return `当前处理: ${state.brushDays}/${badge.target} 天`;
+  if (badge.id.startsWith('companion_')) {
+    const days = getCompanionCheckInDays();
+    return `累计签到陪伴: ${days}/${badge.target} 天`;
+  }
+  if (badge.id === 'feed_50') return `喂食次数: ${state.feedCount}/${badge.target} 次`;
+  if (badge.id === 'fetch_50') return `抛球次数: ${state.playCount}/${badge.target} 次`;
+  return '';
+}
+
+function openBadgeDetailModal(badge, isUnlocked, unlockedDate) {
+  document.getElementById('badge-detail-icon').innerHTML = `<div style="font-size:50px;">${badge.icon}</div>`;
+  document.getElementById('badge-detail-title').innerText = badge.name;
+  document.getElementById('badge-detail-desc').innerText = badge.desc;
+  document.getElementById('badge-detail-progress').innerText = getBadgeProgressText(badge);
+  document.getElementById('badge-detail-date').innerText = isUnlocked ? `✨ 获得于 ${unlockedDate}` : "🔒 未达成条件";
+  document.getElementById('badge-modal').classList.remove('hidden');
+}
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  list.innerHTML = '';
+  state.tasks.forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'task-item';
+    item.innerHTML = `
+      <div class="task-left">
+        <div class="checkbox ${t.done ? 'checked' : ''}" onclick="toggleTask(${t.id})">${t.done ? '✓' : ''}</div>
+        <span style="${t.done ? 'text-decoration:line-through; color:#aaa;' : ''}">${t.text}</span>
+      </div>
+      <button style="border:none; background:none; cursor:pointer; color:#ccc;" onclick="deleteTask(${t.id})">🗑️</button>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function toggleTask(id) {
+  const task = state.tasks.find(t => t.id === id);
+  if (task) {
+    task.done = !task.done;
+    if (task.done) {
+      state.coins += 5;
+      recordTodayActivity();
+      evaluateAllBadges();
+      showToast("✅ 完成目标！奖励 5 🪙");
+    }
+    saveData();
+    renderApp();
+  }
+}
+
+function deleteTask(id) {
+  state.tasks = state.tasks.filter(t => t.id !== id);
+  saveData();
+  renderApp();
+}
+
+function openAddTaskModal() { document.getElementById('add-task-modal').classList.remove('hidden'); }
+function saveNewTask() {
+  const text = document.getElementById('add-task-input').value.trim();
+  if (text) {
+    state.tasks.push({ id: Date.now(), text, done: false });
+    document.getElementById('add-task-input').value = '';
+    closeModal('add-task-modal');
+    saveData();
+    renderApp();
+  }
+}
+
+
+// ==========================================
+// ⏰ 闹钟 / 早安 / 通知系统
+// ==========================================
+function escapeHtml(t) { return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toMin(t) { const [h, m] = (t || '0:0').split(':').map(Number); return (h || 0) * 60 + (m || 0); }
+
+const MORNING_MSGS = [
+  "早安主人！新的一天，{n}陪你一起加油 🐾",
+  "汪！太阳升起来啦，记得签到领狗狗币哦 ☀️",
+  "早上好～今天也要元气满满，{n}在等你摸摸头 🧡",
+  "起床啦起床啦！{n}已经摇着尾巴等你了 🐶"
+];
+
+async function getSWReg() {
+  if (!('serviceWorker' in navigator)) return null;
+  try {
+    let reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) reg = await navigator.serviceWorker.register('./sw.js');
+    if (reg.active) return reg;
+    return await Promise.race([navigator.serviceWorker.ready, new Promise(r => setTimeout(() => r(null), 4000))]);
+  } catch (e) { window._notifyErr = String((e && e.message) || e); return null; }
+}
+
+async function notifyUser(title, body, tag) {
+  window._notifyErr = '';
+  if (NATIVE) return false;
+  try {
+    if (!('Notification' in window)) { window._notifyErr = '浏览器不支持通知'; return false; }
+    if (Notification.permission !== 'granted') { window._notifyErr = '还没有授权通知'; return false; }
+    const reg = await getSWReg();
+    if (reg) {
+      await reg.showNotification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', vibrate: [120, 60, 120], tag: tag || 'puppy', renotify: true, data: { url: './' } });
+      return true;
+    }
+    if (!/Android|iPhone|iPad/i.test(navigator.userAgent)) { new Notification(title, { body }); return true; }
+    window._notifyErr = window._notifyErr || 'sw.js 没有注册成功';
+    return false;
+  } catch (e) { window._notifyErr = String((e && e.message) || e); return false; }
+}
+
+function ringBeep() {
+  try {
+    initAudioContext();
+    if (!audioCtx) return;
+    [0, 0.25, 0.5].forEach(t => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.25, audioCtx.currentTime + t + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + t + 0.2);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t + 0.22);
+    });
+  } catch (e) {}
+}
+
+function checkReminders() {
+  if (!state.adopted) return;
+  const dayBefore = state.todayDate;
+  checkDailyReset();
+  if (dayBefore !== state.todayDate) renderApp();
+  if (document.visibilityState === 'visible') state.lastSeen = Date.now();
+  const now = new Date();
+  const today = getTodayString();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  let changed = false;
+
+  if (state.morningEnabled) {
+    const t = toMin(state.morningTime);
+    if (state.lastMorningDate !== today && nowMin >= t && nowMin - t <= 60) {
+      state.lastMorningDate = today;
+      changed = true;
+      const msg = MORNING_MSGS[Math.floor(Math.random() * MORNING_MSGS.length)].replace('{n}', state.name);
+      notifyUser('🌅 早安！', msg, 'morning');
+      showToast('🌅 ' + msg);
+      const b = document.getElementById('pet-bubble'); if (b) b.innerText = msg;
+    }
+  }
+
+  (state.alarms || []).forEach(a => {
+    if (!a.enabled) return;
+    const t = toMin(a.time);
+    if (a.lastFired !== today && nowMin >= t && nowMin - t <= 10) {
+      a.lastFired = today;
+      changed = true;
+      const label = a.label || '闹钟';
+      notifyUser('⏰ ' + label, `${a.time} 到啦！${state.name}在叫你～`, 'alarm-' + a.id);
+      showToast(`⏰ ${label}（${a.time}）`);
+      if (navigator.vibrate) { try { navigator.vibrate([200, 100, 200, 100, 200]); } catch (e) {} }
+      ringBeep();
+    }
+  });
+
+  if (checkNag(now, nowMin, today)) changed = true;
+  if (changed || document.visibilityState === 'visible') saveData();
+}
+
+function updateNotifyHint() {
+  const hint = document.getElementById('notify-hint');
+  const btn = document.getElementById('notify-perm-btn');
+  if (!hint || !btn) return;
+  if (NATIVE) {
+    const g = window._nativePerm === 'granted';
+    btn.innerText = g ? '✅ 已开启' : '🔔 开启通知'; btn.disabled = g;
+    hint.innerText = g ? '已用手机系统闹钟安排提醒，关掉 App 也会准时响。' : '请点右上角开启通知（Android 13 以上会弹出权限窗口）。';
+    return;
+  }
+  const supported = 'Notification' in window;
+  const perm = supported ? Notification.permission : 'unsupported';
+  if (perm === 'granted') {
+    btn.innerText = '✅ 已开启'; btn.disabled = true;
+    hint.innerText = '通知已开启。请保持应用在后台运行（建议先"安装"到桌面），闹钟才会准时提醒。';
+  } else if (perm === 'denied') {
+    btn.innerText = '🔔 开启通知'; btn.disabled = false;
+    hint.innerText = '通知已被拒绝。请在浏览器 设置 → 网站设置 → 通知 中允许本应用。';
+  } else if (!supported) {
+    btn.innerText = '🔔 开启通知'; btn.disabled = false;
+    hint.innerText = '当前浏览器不支持通知。iPhone 请先用"添加到主屏幕"安装后再打开。';
+  } else {
+    btn.innerText = '🔔 开启通知'; btn.disabled = false;
+    hint.innerText = !window.isSecureContext ? '需要通过 HTTPS 网址打开本应用才能使用通知。' : '先点右上角开启通知，之后闹钟和早安才能弹到手机通知栏。';
+  }
+}
+
+async function enableNotifications() {
+  if (NATIVE) return enableNative();
+  if (!('Notification' in window)) { showToast('📱 当前浏览器不支持通知（iPhone 请先添加到主屏幕）'); return; }
+  if (!window.isSecureContext) { showToast('🔒 需要 HTTPS 网址才能使用通知'); return; }
+  const perm = await Notification.requestPermission();
+  updateNotifyHint();
+  if (perm === 'granted') {
+    await getSWReg();
+    registerPeriodicSync();
+    const sent = await notifyUser('🐶 通知已开启', `${state.name} 会准时提醒你哦！`, 'welcome');
+    showToast(sent ? '🔔 通知已开启，请看通知栏' : '已允许，但发送失败：' + (window._notifyErr || ''));
+    if (!sent) diagnoseNotifications();
+  } else {
+    showToast('通知被拒绝，请在浏览器设置中允许');
+  }
+}
+
+async function diagnoseNotifications() {
+  if (NATIVE) return diagnoseNative();
+  const out = [];
+  const ok = t => out.push('✅ ' + t), bad = t => out.push('❌ ' + t);
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  const standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone;
+  window.isSecureContext ? ok('网址是 HTTPS，正常') : bad('不是 HTTPS（或是直接打开的本地文件）。请把文件上传到 HTTPS 网站（GitHub Pages / Netlify / Cloudflare Pages）后，用网址打开');
+  if (window.top !== window.self) bad('页面在嵌入窗口里打开，浏览器会拦截通知。请在 Chrome 里直接打开网址');
+  if (isIOS) standalone ? ok('已从主屏幕图标打开') : bad('iPhone 必须先「分享 → 添加到主屏幕」，再从桌面图标打开，才能收到通知（需 iOS 16.4 以上）');
+  if (!('Notification' in window)) bad('当前浏览器不支持通知');
+  else if (Notification.permission === 'granted') ok('通知权限：已允许');
+  else if (Notification.permission === 'denied') bad('通知权限被拒绝。Chrome：右上角 ⋮ → 设置 → 网站设置 → 通知 → 允许本网站；或长按桌面图标 → 应用信息 → 通知 → 打开');
+  else bad('还没授权：请点上面的「开启通知」，弹窗里选「允许」');
+  if (!('serviceWorker' in navigator)) bad('浏览器不支持后台服务');
+  else {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration();
+      reg ? ok('后台服务 sw.js 已注册' + (reg.active ? '' : '（还在启动，稍等几秒再试）')) : bad('后台服务 sw.js 没有注册：请确认 sw.js 与本页面在同一个文件夹，并刷新页面');
+    } catch (e) { bad('后台服务出错：' + e.message); }
+  }
+  out.push('ℹ️ 还请检查：手机没开勿扰模式；系统设置里 Chrome（或已安装的小狗应用）的通知开关是打开的；省电模式没有限制它');
+  const box = document.getElementById('notify-diag');
+  box.style.display = 'block';
+  box.textContent = out.join('\n');
+}
+
+async function testNotification() {
+  if (NATIVE) return testNative();
+  if (!('Notification' in window) || Notification.permission !== 'granted') { showToast('请先点右上角"开启通知"并选择允许'); diagnoseNotifications(); return; }
+  showToast('⏳ 5 秒后发送：请现在按 Home 键回到桌面或锁屏，然后看通知栏');
+  await wait(5000);
+  const ok = await notifyUser('🐶 测试通知', `汪！${state.name}给你发来了消息～`, 'test');
+  if (ok) showToast('📨 已发送！请下拉手机通知栏查看');
+  else { showToast('发送失败：' + (window._notifyErr || '未知原因')); diagnoseNotifications(); }
+}
+
+async function registerPeriodicSync() {
+  try {
+    if (!('serviceWorker' in navigator)) return;
+    const reg = await navigator.serviceWorker.ready;
+    if (!('periodicSync' in reg)) return;
+    const st = await navigator.permissions.query({ name: 'periodic-background-sync' });
+    if (st.state === 'granted') await reg.periodicSync.register('puppy-reminders', { minInterval: 15 * 60 * 1000 });
+  } catch (e) {}
+}
+
+function renderAlarms() {
+  const mt = document.getElementById('morning-time');
+  if (!mt) return;
+  if (document.activeElement !== mt) mt.value = state.morningTime || '00:01';
+  document.getElementById('morning-toggle').checked = !!state.morningEnabled;
+  const nt = document.getElementById('nag-night-time');
+  if (document.activeElement !== nt) nt.value = state.nagNightTime || '21:00';
+  document.getElementById('nag-toggle').checked = state.nagEnabled !== false;
+  const list = document.getElementById('alarm-list');
+  list.innerHTML = '';
+  const alarms = (state.alarms || []).slice().sort((a, b) => a.time.localeCompare(b.time));
+  if (!alarms.length) {
+    list.innerHTML = '<div style="font-size:12px;color:#b9a79d;text-align:center;padding:6px 0;">还没有闹钟，在下方添加一个吧</div>';
+  }
+  alarms.forEach(a => {
+    const row = document.createElement('div');
+    row.className = 'alarm-row' + (a.enabled ? '' : ' off');
+    row.innerHTML = `
+      <div><div class="alarm-time">${a.time}</div><div style="font-size:12px;color:var(--text-sub);">${escapeHtml(a.label || '闹钟')}</div></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label class="switch"><input type="checkbox" ${a.enabled ? 'checked' : ''} onchange="toggleAlarm(${a.id}, this.checked)"><span></span></label>
+        <button style="border:none;background:none;cursor:pointer;color:#ccc;font-size:16px;" onclick="deleteAlarm(${a.id})">🗑️</button>
+      </div>`;
+    list.appendChild(row);
+  });
+  updateNotifyHint();
+}
+
+function addAlarm() {
+  const time = document.getElementById('new-alarm-time').value;
+  const label = document.getElementById('new-alarm-label').value.trim();
+  if (!time) { showToast('请选择闹钟时间'); return; }
+  state.alarms.push({ id: Date.now(), time, label, enabled: true, lastFired: '' });
+  document.getElementById('new-alarm-label').value = '';
+  saveData(); renderAlarms();
+  showToast(`⏰ 已添加闹钟 ${time}`);
+  if ('Notification' in window && Notification.permission === 'default') showToast('别忘了点右上角开启通知哦');
+}
+function toggleAlarm(id, on) {
+  const a = state.alarms.find(x => x.id === id);
+  if (a) { a.enabled = on; if (on) a.lastFired = ''; saveData(); renderAlarms(); }
+}
+function deleteAlarm(id) {
+  state.alarms = state.alarms.filter(x => x.id !== id);
+  saveData(); renderAlarms();
+}
+function toggleMorning(on) { state.morningEnabled = on; saveData(); showToast(on ? '🌅 每日早安已开启' : '每日早安已关闭'); }
+function setMorningTime(v) {
+  if (!v) return;
+  state.morningTime = v;
+  const n = new Date();
+  if (toMin(v) > n.getHours() * 60 + n.getMinutes()) state.lastMorningDate = '';
+  saveData(); showToast(`🌅 早安通知时间：${v}`);
+}
+
+setInterval(checkReminders, 15000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkReminders(); });
+window.addEventListener('load', () => { setTimeout(() => { checkReminders(); registerPeriodicSync(); updateNotifyHint(); }, 1200); });
+
+
+// ==========================================
+// 🐶 目标监督 & 回归欢迎气泡
+// ==========================================
+const WELCOME_AWAY_MS = 2 * 3600 * 1000;
+
+function nagText(kind, pending) {
+  const n = state.name, k = pending.length;
+  const names = pending.slice(0, 2).map(t => t.text).join('、');
+  if (kind === 'night1') return `夜深啦～今天还有 ${k} 个目标没完成（${names}）。${n}陪你一起收个尾，好不好？🌙`;
+  if (kind === 'night2') return `${n}还在等你呢！只差一点点就能完成今天的目标啦（${names}），我陪着你，一起加油！这是今晚最后一次提醒～💪`;
+  const day = [
+    `主人～还有 ${k} 个目标没完成（${names}），要不要现在和${n}一起做一点点？🐾`,
+    `汪！${n}想请你帮个忙：今天的目标还剩 ${k} 个（${names}），我们一起完成它吧！`,
+    `${n}在旁边给你加油～先从「${pending[0].text}」开始，好吗？🧡`
+  ];
+  return day[Math.floor(Math.random() * day.length)];
+}
+
+function checkNag(now, nowMin, today) {
+  if (state.nagEnabled === false) return false;
+  let changed = false;
+  if (state.nagDate !== today) {
+    state.nagDate = today; state.nagNightCount = 0; state.lastNightNagAt = 0; state.lastDayNag = 0; changed = true;
+  }
+  if (!('Notification' in window) || Notification.permission !== 'granted') return changed;
+  if (document.visibilityState === 'visible') return changed;
+  const pending = (state.tasks || []).filter(t => !t.done);
+  if (!pending.length || (state.nagNightCount || 0) >= 2) return changed;
+  const nowMs = now.getTime(), night = toMin(state.nagNightTime || '21:00');
+  const title = `🐶 ${state.name}想陪你完成目标`;
+  if (nowMin >= night) {
+    if (!state.nagNightCount) {
+      state.nagNightCount = 1; state.lastNightNagAt = nowMs; changed = true;
+      notifyUser(title, nagText('night1', pending), 'nag');
+    } else if (nowMs - state.lastNightNagAt >= 3600000) {
+      state.nagNightCount = 2; state.lastNightNagAt = nowMs; changed = true;
+      notifyUser(title, nagText('night2', pending), 'nag');
+    }
+  } else if (nowMin >= 9 * 60) {
+    if (nowMs - Math.max(state.lastDayNag || 0, state.lastSeen || 0) >= 7200000) {
+      state.lastDayNag = nowMs; changed = true;
+      notifyUser(title, nagText('day', pending), 'nag');
+    }
+  }
+  return changed;
+}
+
+function toggleNag(on) { state.nagEnabled = on; saveData(); showToast(on ? '🐶 目标监督已开启' : '目标监督已关闭'); }
+function setNagNightTime(v) {
+  if (!v) return;
+  state.nagNightTime = v; state.nagNightCount = 0; state.lastNightNagAt = 0;
+  saveData(); showToast(`🌙 晚间提醒时间：${v}`);
+}
+
+function showWelcomeBack(awayMs) {
+  const mins = Math.floor(awayMs / 60000), hrs = Math.floor(mins / 60);
+  const dur = hrs >= 24 ? `${Math.floor(hrs / 24)} 天` : (hrs >= 1 ? `${hrs} 个小时` : `${mins} 分钟`);
+  const left = (state.tasks || []).filter(t => !t.done).length;
+  const extra = left ? `还有 ${left} 个目标等着我们一起完成呢～` : '今天的目标都完成啦，快来摸摸我～';
+  const old = document.getElementById('welcome-bubble'); if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'welcome-bubble'; el.className = 'welcome-bubble';
+  el.innerHTML = `<div class="wb-emoji">🐶</div><div class="wb-text"><b>汪汪！主人你终于回来啦！</b><br>${escapeHtml(state.name)}已经等了你 ${dur}，好想你～<br><span style="color:var(--primary);">${extra}</span></div>`;
+  el.onclick = () => el.remove();
+  document.getElementById('app').appendChild(el);
+  const b = document.getElementById('pet-bubble'); if (b) b.innerText = `主人！你终于回来啦，我等你好久了～`;
+  if (navigator.vibrate) { try { navigator.vibrate([60, 40, 60]); } catch (e) {} }
+  setTimeout(() => { if (el.parentNode) el.remove(); }, 9000);
+}
+
+function handleReturn() {
+  if (!state.adopted) return;
+  const prev = state.lastSeen || 0, now = Date.now();
+  if (prev && now - prev >= WELCOME_AWAY_MS) setTimeout(() => showWelcomeBack(now - prev), 600);
+  state.lastSeen = now; saveData();
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (!state.adopted) return;
+  if (document.hidden) { state.lastSeen = Date.now(); saveData(); }
+  else handleReturn();
+});
+window.addEventListener('pagehide', () => { if (state.adopted) { state.lastSeen = Date.now(); saveData(); } });
+
+
+// ==========================================
+// 💬 和小狗聊天（有自己的喜好和观点）
+// ==========================================
+let chatBusy = false;
+const CHAT_CHIPS = ['你最喜欢什么颜色？', '你最爱吃什么？', '我今天有点累', '陪我完成目标吧', '你讨厌什么？'];
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+function dogSystemPrompt() {
+  const left = (state.tasks || []).filter(t => !t.done).map(t => t.text);
+  return `你是一只名叫「${state.name}」的${(BREED_STYLES[state.breed] || {}).name || '小狗'}，是主人的电子宠物伙伴。用简体中文、口语化、可爱地聊天，每次1-3句话，偶尔用"汪"、摇尾巴等动作和少量emoji。
+你有自己的性格和观点，不要什么都附和主人：
+- 最喜欢的颜色是蓝色（天空、大海、蓝色牙刷、蓝莓），会主动提起；对红色一般；讨厌打雷和黑漆漆的夜晚。
+- 最爱的食物是鸭胸肉，觉得罐头也不错；最爱抛球和被摸下巴；不喜欢洗澡，也不喜欢被独自留在家。
+- 被问到喜好或看法时，给出明确立场并说出理由，可以礼貌地和主人意见不同，但永远温柔、关心主人。
+- 你是小狗，用小狗的视角理解世界；遇到医疗、法律等专业问题，诚实说你只是小狗，建议找专业的人。
+- 主人难过时先安慰再陪伴；如果主人流露想伤害自己的念头，认真关心，并温柔建议联系身边可信任的人或当地的求助热线。
+当前状态：亲密度 Lv.${state.level}；今天${state.hasFedToday ? '已' : '还没'}喂食；未完成的目标：${left.length ? left.join('、') : '没有，都完成啦'}。`;
+}
+
+function localDogReply(text) {
+  const n = state.name;
+  const left = (state.tasks || []).filter(t => !t.done);
+  const rules = [
+    { re: /蓝|颜色|色彩|什么色/, r: [`我最爱蓝色啦！像天空、像大海，还有我的蓝牙刷～💙 你呢？`, `当然是蓝色！看到蓝色我的尾巴就停不下来，汪！`, `蓝色第一名！红色嘛……还行，但蓝色才是我的命💙`] },
+    { re: /红|粉|黄|绿|紫|黑色|白色|橙/, r: [`这个颜色也不错，不过我还是最偏爱蓝色～💙`, `嗯……我觉得它没有蓝色好看，别怪我偏心哦！`] },
+    { re: /讨厌|不喜欢|怕|害怕|雷/, r: [`我最讨厌洗澡和打雷！一打雷我就想钻进你怀里……`, `被一个人留在家里！还有洗澡，泡泡进耳朵好难受～`] },
+    { re: /吃|饿|食物|鸭|罐头|零食|饭/, r: [`我最爱鸭胸肉！罐头排第二，饼干只能算小点心～`, `说到吃我就精神啦！不过我坚持：鸭胸肉 > 罐头 > 狗粮。`] },
+    { re: /目标|任务|打卡|完成|学习|作业|工作|加油/, r: [left.length ? `还剩 ${left.length} 个目标呢（${left.slice(0, 2).map(t => t.text).join('、')}）。先做最小的一步，我在旁边陪你！` : `今天的目标都完成啦，你好厉害！我要给你摇尾巴转圈圈～`] },
+    { re: /累|难过|伤心|烦|焦虑|压力|哭|不开心|郁闷/, r: [`过来，让我蹭蹭你。累了就先歇一会儿，我一直都在。🧡`, `不开心的话可以跟我说说，我不会评价你，只会陪着你。`] },
+    { re: /开心|高兴|太棒|哈哈|好耶/, r: [`你开心我也开心！尾巴已经摇成螺旋桨啦～`, `汪汪！好事要分享，快多讲一点！`] },
+    { re: /洗澡/, r: [`不要不要！我宁愿去追一百次球也不想洗澡……`] },
+    { re: /球|玩|散步|出去|跑/, r: [`玩球！玩球！快点开抛球模式，我要叼一个蓝色的！`, `出去玩我最积极了！不过要跟着你，不许跑太快～`] },
+    { re: /名字|你是谁|叫什么/, r: [`我是${n}呀，你的专属小狗！记得喊我名字，我听得到～`] },
+    { re: /爱你|喜欢你|想你|最好/, r: [`我也最最最喜欢你啦！仅次于蓝色……开玩笑的，你更重要！`, `被你这么说我害羞了，尾巴不听使唤地摇～`] },
+    { re: /早安|早上好|早/, r: [`早安！今天也要元气满满，我已经准备好陪你啦～`] },
+    { re: /晚安|睡觉|困/, r: [`晚安～我会在你旁边守着，做个有蓝色天空的梦吧。`] },
+    { re: /你觉得|你认为|你怎么看|你说/, r: [`我的看法嘛……凡事先慢慢来，开心最重要！当然，我是只小狗，别全听我的😄`] }
+  ];
+  for (const rule of rules) if (rule.re.test(text)) return pick(rule.r).replace(/\{n\}/g, n);
+  return pick([`汪？再多说一点嘛，我想听～`, `嗯嗯，我在认真听！顺便问你，你喜欢蓝色吗？`, `${n}歪着头看你……你继续说～`, `不管怎样，我都站在你这边！`]);
+}
+
+async function askDogAI() {
+  const msgs = (state.chatLog || []).slice(-12).map(m => ({ role: m.role === 'me' ? 'user' : 'assistant', content: m.text }));
+  while (msgs.length && msgs[0].role !== 'user') msgs.shift();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const res = await fetch(state.chatApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ system: dogSystemPrompt(), messages: msgs }), signal: ctrl.signal });
+    if (!res.ok) throw new Error('bad status');
+    const d = await res.json();
+    return (d.reply || '').trim() || null;
+  } finally { clearTimeout(timer); }
+}
+
+function addChatBubble(role, text) {
+  const list = document.getElementById('chat-list');
+  const row = document.createElement('div');
+  row.className = 'chat-row ' + role;
+  if (role === 'dog') { const a = document.createElement('div'); a.className = 'chat-mini-avatar'; a.textContent = '🐶'; row.appendChild(a); }
+  const b = document.createElement('div'); b.className = 'chat-bubble'; b.textContent = text;
+  row.appendChild(b); list.appendChild(row);
+  list.scrollTop = list.scrollHeight;
+  return row;
+}
+
+function pushChat(role, text) {
+  if (!state.chatLog) state.chatLog = [];
+  state.chatLog.push({ role, text });
+  if (state.chatLog.length > 40) state.chatLog = state.chatLog.slice(-40);
+  addChatBubble(role, text);
+  saveData();
+}
+
+function updateChatMode() {
+  document.getElementById('chat-title').textContent = state.name;
+  document.getElementById('chat-mode').textContent = state.chatApiUrl ? '✨ AI 模式 · 有自己的想法' : '🧠 离线性格模式 · 爱蓝色的小狗';
+  document.getElementById('chat-api-url').value = state.chatApiUrl || '';
+}
+
+function openChatModal(e) {
+  if (e) e.stopPropagation();
+  if (!state.chatLog) state.chatLog = [];
+  updateChatMode();
+  const list = document.getElementById('chat-list'); list.innerHTML = '';
+  const chips = document.getElementById('chat-chips'); chips.innerHTML = '';
+  CHAT_CHIPS.forEach(c => { const b = document.createElement('button'); b.className = 'chat-chip'; b.textContent = c; b.onclick = () => sendChat(c); chips.appendChild(b); });
+  document.getElementById('chat-modal').classList.remove('hidden');
+  if (!state.chatLog.length) {
+    pushChat('dog', `汪！我是${state.name}～你可以问我最喜欢什么颜色，我最爱蓝色啦💙`);
+  } else {
+    state.chatLog.forEach(m => addChatBubble(m.role, m.text));
+  }
+}
+
+function toggleChatSettings() { document.getElementById('chat-settings').classList.toggle('hidden'); }
+function saveChatApiUrl() {
+  const v = document.getElementById('chat-api-url').value.trim();
+  if (v && !/^https?:\/\//i.test(v)) { showToast('请输入以 https:// 开头的地址'); return; }
+  state.chatApiUrl = v; saveData(); updateChatMode();
+  document.getElementById('chat-settings').classList.add('hidden');
+  showToast(v ? '✨ 已切换为 AI 模式' : '🧠 已切换为离线性格模式');
+}
+
+async function sendChat(preset) {
+  const input = document.getElementById('chat-input');
+  const text = (typeof preset === 'string' ? preset : input.value).trim();
+  if (!text || chatBusy) return;
+  input.value = '';
+  chatBusy = true;
+  pushChat('me', text);
+  const typing = addChatBubble('dog', '…'); typing.classList.add('typing');
+  let reply = null;
+  if (state.isSleeping) {
+    reply = `Zzz…（${state.name}翻了个身，梦里好像在追一只蓝色的球……）`;
+  } else if (state.chatApiUrl) {
+    try { reply = await askDogAI(); } catch (e) { reply = null; }
+  }
+  if (!reply) { await wait(500 + Math.random() * 600); reply = localDogReply(text); }
+  typing.remove();
+  pushChat('dog', reply);
+  chatBusy = false;
+  const today = getTodayString();
+  if (state.lastChatExpDate !== today) { state.lastChatExpDate = today; addExp(3); }
+}
+
+
+// ==========================================
+// 📱 原生 App（Capacitor APK）：用系统闹钟安排提醒，关掉 App 也会准时响
+// ==========================================
+const NATIVE = !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform());
+const LN = () => (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.LocalNotifications) || null;
+const NAG_SLOTS = [9, 11, 13, 15, 17, 19];
+let _nativeSig = '', _nativeT = null;
+
+function nativeSig() {
+  return JSON.stringify([getTodayString(), state.morningEnabled, state.morningTime,
+    (state.alarms || []).map(a => [a.id, a.time, a.enabled, a.label]),
+    state.nagEnabled, state.nagNightTime, (state.tasks || []).map(t => t.done), state.name]);
+}
+function scheduleNativeSync(force) {
+  if (!NATIVE) return;
+  clearTimeout(_nativeT);
+  _nativeT = setTimeout(() => syncNativeSchedule(force), 1200);
+}
+
+async function syncNativeSchedule(force) {
+  const ln = LN();
+  if (!NATIVE || !ln || !state.adopted) return;
+  try {
+    const perm = await ln.checkPermissions();
+    window._nativePerm = perm.display;
+    if (perm.display !== 'granted') return;
+    const sig = nativeSig();
+    if (!force && sig === _nativeSig) return;
+    _nativeSig = sig;
+    const pend = await ln.getPending();
+    if (pend.notifications.length) await ln.cancel({ notifications: pend.notifications.map(n => ({ id: n.id })) });
+    const list = [], n = state.name;
+    if (state.morningEnabled !== false) {
+      const t = toMin(state.morningTime || '00:01');
+      list.push({ id: 1, title: '🌅 早安！', body: pick(MORNING_MSGS).replace('{n}', n), schedule: { on: { hour: Math.floor(t / 60), minute: t % 60 }, allowWhileIdle: true } });
+    }
+    (state.alarms || []).filter(a => a.enabled).forEach(a => {
+      const t = toMin(a.time);
+      list.push({ id: 1000 + (a.id % 900000), title: '⏰ ' + (a.label || '闹钟'), body: `${a.time} 到啦！${n}在叫你～`, schedule: { on: { hour: Math.floor(t / 60), minute: t % 60 }, allowWhileIdle: true } });
+    });
+    if (state.nagEnabled !== false) {
+      const now = new Date(), night = toMin(state.nagNightTime || '21:00');
+      const allTasks = state.tasks || [], pending = allTasks.filter(t => !t.done);
+      for (let d = 0; d < 3; d++) {
+        const tasks = d === 0 ? pending : allTasks;
+        if (!tasks.length) continue;
+        const slots = NAG_SLOTS.map(h => [h * 60, 'day']).filter(x => x[0] < night);
+        slots.push([night, 'night1'], [night + 60, 'night2']);
+        slots.forEach(([min, kind], idx) => {
+          if (min >= 1440) return;
+          const at = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d, Math.floor(min / 60), min % 60, 0, 0);
+          if (at <= now) return;
+          list.push({ id: 5000 + d * 20 + idx, title: `🐶 ${n}想陪你完成目标`, body: nagText(kind, tasks), schedule: { at, allowWhileIdle: true } });
+        });
+      }
+    }
+    if (list.length) await ln.schedule({ notifications: list });
+  } catch (e) { window._notifyErr = String((e && e.message) || e); }
+}
+
+async function refreshNativePerm() {
+  try { const p = await LN().checkPermissions(); window._nativePerm = p.display; updateNotifyHint(); } catch (e) {}
+}
+
+async function enableNative() {
+  const ln = LN();
+  if (!ln) { showToast('通知组件未就绪，请重新打开 App'); return; }
+  try {
+    const r = await ln.requestPermissions();
+    window._nativePerm = r.display; updateNotifyHint();
+    if (r.display !== 'granted') { showToast('通知被拒绝，请到 系统设置 → 应用 → 治愈小狗 → 通知 中开启'); return; }
+    try {
+      const e = await ln.checkExactNotificationSetting();
+      if (e.exact_alarm !== 'granted') { showToast('请在接下来的页面允许「闹钟和提醒」'); await ln.changeExactNotificationSetting(); }
+    } catch (e) {}
+    await syncNativeSchedule(true);
+    showToast('🔔 已开启，提醒将由系统闹钟准时发送');
+  } catch (e) { showToast('开启失败：' + (e.message || e)); }
+}
+
+async function testNative() {
+  const ln = LN();
+  if (window._nativePerm !== 'granted') { showToast('请先点右上角"开启通知"'); return; }
+  showToast('⏳ 5 秒后发送：请按 Home 键回到桌面，再看通知栏');
+  await ln.schedule({ notifications: [{ id: 2, title: '🐶 测试通知', body: `汪！${state.name}给你发来了消息～`, schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true } }] });
+}
+
+async function diagnoseNative() {
+  const ln = LN(), out = [];
+  const ok = t => out.push('✅ ' + t), bad = t => out.push('❌ ' + t);
+  try {
+    const p = await ln.checkPermissions();
+    p.display === 'granted' ? ok('通知权限已开') : bad('通知权限没开：系统设置 → 应用 → 治愈小狗 → 通知 → 打开，或点上面的「开启通知」');
+  } catch (e) { bad('读取通知权限失败：' + e.message); }
+  try {
+    const e = await ln.checkExactNotificationSetting();
+    e.exact_alarm === 'granted' ? ok('精确闹钟权限已开') : bad('精确闹钟没开：系统设置 → 应用 → 治愈小狗 → 闹钟和提醒 → 允许，否则提醒可能晚几分钟');
+  } catch (e) {}
+  try { const pd = await ln.getPending(); out.push(`ℹ️ 当前已向系统安排 ${pd.notifications.length} 条提醒`); } catch (e) {}
+  out.push('ℹ️ 小米/华为/OPPO/vivo 等手机：请到 电池 或 自启动 管理里，把「治愈小狗」设为「无限制 / 允许自启动 / 后台运行」，否则系统可能清掉提醒');
+  const box = document.getElementById('notify-diag');
+  box.style.display = 'block'; box.textContent = out.join('\n');
+}
+
+document.addEventListener('visibilitychange', () => { if (NATIVE && !document.hidden) scheduleNativeSync(true); });
+window.addEventListener('load', () => { if (NATIVE) setTimeout(() => { refreshNativePerm(); syncNativeSchedule(true); }, 1800); });
+
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+// ==========================================
+// 🚀 注册外部 Service Worker 与 PWA 安装引导
+// ==========================================
+let deferredInstallPrompt = null;
+
+if ('serviceWorker' in navigator && !(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform())) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.warn('Service Worker 注册跳过:', err);
+    });
+  });
+}
+
+// 监听浏览器的“添加到主屏幕/安装PWA”提示事件
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) installBtn.classList.remove('hidden');
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const installBtn = document.getElementById('pwa-install-btn');
+  if (installBtn) installBtn.classList.add('hidden');
+  showToast('🎉 应用已成功安装到桌面！');
+});
+
+async function installPWAApp() {
+  if (!deferredInstallPrompt) {
+    showToast('📱 请点击浏览器菜单选择“添加到主屏幕”进行安装');
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  const { outcome } = await deferredInstallPrompt.userChoice;
+  if (outcome === 'accepted') {
+    deferredInstallPrompt = null;
+    const installBtn = document.getElementById('pwa-install-btn');
+    if (installBtn) installBtn.classList.add('hidden');
+  }
+}
+</script>
+
+<script>
+// 把 🪙 / 🪥 替换成内置矢量图标：老手机没有这两个表情时也不会显示成方框
+(function () {
+  const HAS = /\u{1FA99}|\u{1FAA5}/u;
+  const ALL = /(\u{1FA99}|\u{1FAA5})/gu;
+  const SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, TITLE: 1, NOSCRIPT: 1 };
+  function fix(node) {
+    if (node.nodeType === 3) {
+      const t = node.nodeValue, p = node.parentNode;
+      if (!p || SKIP[p.tagName] || !HAS.test(t)) return;
+      const frag = document.createDocumentFragment();
+      let last = 0, m; ALL.lastIndex = 0;
+      while ((m = ALL.exec(t))) {
+        if (m.index > last) frag.appendChild(document.createTextNode(t.slice(last, m.index)));
+        const i = document.createElement('i');
+        const coin = m[0] === '\u{1FA99}';
+        i.className = 'ico ' + (coin ? 'ico-coin' : 'ico-brush');
+        i.setAttribute('role', 'img'); i.setAttribute('aria-label', coin ? '狗狗币' : '牙刷');
+        frag.appendChild(i); last = ALL.lastIndex;
+      }
+      if (last < t.length) frag.appendChild(document.createTextNode(t.slice(last)));
+      p.replaceChild(frag, node);
+    } else if (node.nodeType === 1 && !SKIP[node.tagName]) {
+      const w = document.createTreeWalker(node, NodeFilter.SHOW_TEXT), list = [];
+      while (w.nextNode()) list.push(w.currentNode);
+      list.forEach(fix);
+    }
+  }
+  const mo = new MutationObserver(ms => ms.forEach(m => {
+    if (m.type === 'characterData') fix(m.target); else m.addedNodes.forEach(fix);
+  }));
+  function start() { fix(document.body); mo.observe(document.body, { childList: true, subtree: true, characterData: true }); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
+</body>
+</html>
